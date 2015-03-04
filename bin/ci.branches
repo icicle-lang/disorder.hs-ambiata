@@ -1,0 +1,5 @@
+#!/bin/sh -exu
+
+### For the moment, this is identical to CI build.
+
+$(dirname $0)/ci
