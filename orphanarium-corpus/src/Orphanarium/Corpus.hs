@@ -18,7 +18,6 @@ cooking = [
   , "diced"
   , "filleted"
   , "sauteed"
-  , "sauteed"
   ]
 
 muppets :: [Text]
