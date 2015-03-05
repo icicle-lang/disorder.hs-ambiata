@@ -1,0 +1,3 @@
+:set -XQuasiQuotes
+:set prompt ">> "
+:set -Wall
