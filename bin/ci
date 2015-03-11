@@ -14,14 +14,14 @@ fi
 
 # test everything
 
-MODULES=aeson
+MODULES=$(ls | grep "orphanarium-")
 
 for x in $MODULES; do
-  (cd orphanarium-$x && make test) || exit $?
+  (cd $x && make test) || exit $?
 done
 
 # build everything
 
 for x in $MODULES; do
-  (cd orphanarium-$x && make build) || exit $?
+  (cd $x && make build) || exit $?
 done
