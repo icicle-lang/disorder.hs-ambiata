@@ -25,6 +25,7 @@ library
   exposed-modules:
                        Paths_orphanarium_core
                        Orphanarium.Core
+                       Orphanarium.Core.Main
                        Orphanarium.Core.Property
 
 test-suite test

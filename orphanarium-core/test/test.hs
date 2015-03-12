@@ -1,13 +1,5 @@
-import           Control.Monad
-
+import           Orphanarium.Core.Main
 import qualified Orphanarium.Core.PropertyTest
 
-import           System.Exit
-import           System.IO
-
-
 main :: IO ()
-main =
-  hSetBuffering stdout LineBuffering >> sequence
-    [ Orphanarium.Core.PropertyTest.tests
-    ] >>= \rs -> unless (and rs) exitFailure
+main = orphanariumMain [Orphanarium.Core.PropertyTest.tests]
