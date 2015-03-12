@@ -14,14 +14,14 @@ fi
 
 # test everything
 
-MODULES=$(ls | grep "orphanarium-")
+MODULES=$(ls orphanarium-*/*.cabal)
 
 for x in $MODULES; do
-  (cd $x && make test) || exit $?
+  (cd $(dirname $x) && make test) || exit $?
 done
 
 # build everything
 
 for x in $MODULES; do
-  (cd $x && make build) || exit $?
+ (cd $(dirname $x) && make build) || exit $?
 done
