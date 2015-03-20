@@ -1,5 +1,27 @@
 #!/bin/sh -exu
 
-### For the moment, this is identical to CI build.
+export LC_COLLATE=en_US.UTF-8
+export LANG=en_US.UTF-8
 
-$(dirname $0)/ci
+rm -rf lib; mkdir -p lib
+git submodule sync
+git submodule init
+git submodule update
+
+if find $HOME/.cabal/packages/hackage.haskell.org/00-index.cache -type f -mtime +1 | grep -q 00-index; then
+    cabal update
+fi
+
+# test everything
+
+MODULES=$(ls orphanarium-*/*.cabal)
+
+for x in $MODULES; do
+  (cd $(dirname $x) && make test) || exit $?
+done
+
+# build everything
+
+for x in $MODULES; do
+ (cd $(dirname $x) && make build) || exit $?
+done
