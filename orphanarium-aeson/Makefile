@@ -3,7 +3,7 @@ MAKEFLAGS = $(MFLAGS)
 SANDBOX = ../.cabal-sandbox
 CABAL_FLAGS =
 LIB = ../lib
-DEPS = ${SANDBOX}/.cairn
+DEPS = ${SANDBOX}/.cairn-aeson
 
 .PHONY: build test repl repl-test quick tags
 
