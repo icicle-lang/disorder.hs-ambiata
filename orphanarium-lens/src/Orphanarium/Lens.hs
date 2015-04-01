@@ -10,7 +10,7 @@ module Orphanarium.Lens (
 
 import Control.Applicative ( pure )
 import Control.Lens ( Traversal', Prism', (^.) , (^?), (.~), mapped, re )
-import Test.QuickCheck ( Property, (===), conjoin )
+import Test.QuickCheck ( Arbitrary, Property, (===), conjoin, property )
 
 -- Prism Laws
 
@@ -23,8 +23,12 @@ prismConverseSymmetry l x = fmap (^. re l) (x ^? l) === (mapped .~ x) (x ^? l)
 -- |
 -- Prisms must satisfy the Symmetry and Converse Symmetry laws as well as the Traversal Laws.
 --
-prismLaws :: (Show a, Eq a, Show s, Eq s) => Prism' s a -> s -> a -> Property
-prismLaws p x y = conjoin [prismSymmetry p y, prismConverseSymmetry p x, traversalPure p x]
+prismLaws :: (Show a, Eq a, Arbitrary a, Show s, Eq s, Arbitrary s) => Prism' s a -> Property
+prismLaws p = conjoin [
+    property $ prismSymmetry p
+  , property $ prismConverseSymmetry p
+  , property $ traversalPure p
+  ]
 
 -- Traversal Laws
 
