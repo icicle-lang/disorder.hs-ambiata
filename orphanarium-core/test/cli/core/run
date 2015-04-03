@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "This should not run as it is excluded for 'framework' code."
+
+exit 1
