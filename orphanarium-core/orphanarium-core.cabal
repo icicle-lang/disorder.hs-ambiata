@@ -13,6 +13,8 @@ description:           orphanarium-core.
 library
   build-depends:
                        base                            >= 3          && < 5
+                     , directory                       == 1.2.*
+                     , process                         == 1.2.*
                      , QuickCheck                      == 2.7.*
 
   ghc-options:
@@ -42,3 +44,18 @@ test-suite test
                        base                            >= 3          && < 5
                      , orphanarium-core
                      , QuickCheck
+
+
+test-suite test-cli
+  type:                exitcode-stdio-1.0
+
+  main-is:             test-cli.hs
+
+  ghc-options:         -Wall -threaded -O2
+
+  hs-source-dirs:
+                       test
+
+  build-depends:
+                       base                            >= 3          && < 5
+                     , orphanarium-core
