@@ -3,3 +3,4 @@ module Orphanarium.Core (
     ) where
 
 import Orphanarium.Core.Property as OC
+import Orphanarium.Core.UniquePair as OC

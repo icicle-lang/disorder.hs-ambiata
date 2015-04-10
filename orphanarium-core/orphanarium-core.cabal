@@ -29,6 +29,7 @@ library
                        Orphanarium.Core
                        Orphanarium.Core.Main
                        Orphanarium.Core.Property
+                       Orphanarium.Core.UniquePair
 
 test-suite test
   type:                exitcode-stdio-1.0
