@@ -13,7 +13,7 @@ description:           orphanarium-lens.
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , lens                            == 4.8.*
+                     , lens                            >= 4.6        && < 4.9
                      , QuickCheck                      == 2.7.*
 
   ghc-options:
