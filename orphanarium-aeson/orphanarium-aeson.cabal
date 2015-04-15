@@ -15,6 +15,7 @@ library
                        base                            >= 3          && < 5
                      , aeson                           == 0.8.*
                      , QuickCheck                      == 2.7.*
+                     , unordered-containers            == 0.2.*
 
   ghc-options:
                        -Wall
@@ -42,3 +43,5 @@ test-suite test
                      , orphanarium-aeson
                      , aeson
                      , QuickCheck
+                     , quickcheck-instances            == 0.3.*
+                     , text                            == 1.2.*
