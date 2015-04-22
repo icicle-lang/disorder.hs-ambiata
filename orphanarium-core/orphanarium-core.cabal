@@ -27,6 +27,7 @@ library
   exposed-modules:
                        Paths_orphanarium_core
                        Orphanarium.Core
+                       Orphanarium.Core.IO
                        Orphanarium.Core.Main
                        Orphanarium.Core.Property
                        Orphanarium.Core.UniquePair
