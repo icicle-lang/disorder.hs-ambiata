@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Orphanarium.AesonTest where
+module Test.Orphanarium.Aeson where
 
 import           Orphanarium.Aeson
 

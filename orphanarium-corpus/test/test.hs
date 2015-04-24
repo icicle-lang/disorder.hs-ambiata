@@ -1,6 +1,6 @@
 import           Control.Monad
 
-import qualified Orphanarium.CorpusTest
+import qualified Test.Orphanarium.Corpus
 
 import           System.Exit
 import           System.IO
@@ -9,5 +9,5 @@ import           System.IO
 main :: IO ()
 main =
   hSetBuffering stdout LineBuffering >> mapM id [
-      Orphanarium.CorpusTest.tests
+      Test.Orphanarium.Corpus.tests
     ] >>= \rs -> when (not . all id $ rs) exitFailure

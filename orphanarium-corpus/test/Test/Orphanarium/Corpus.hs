@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Orphanarium.CorpusTest where
+module Test.Orphanarium.Corpus where
 
 import           Control.Applicative
 

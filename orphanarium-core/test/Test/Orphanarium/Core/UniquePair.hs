@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Orphanarium.Test.Core.UniquePair where
+module Test.Orphanarium.Core.UniquePair where
 
 import           Orphanarium.Core.Property
 import           Orphanarium.Core.UniquePair
