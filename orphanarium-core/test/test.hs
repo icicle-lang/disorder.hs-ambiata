@@ -1,9 +1,9 @@
 import           Orphanarium.Core.Main
-import qualified Orphanarium.Core.PropertyTest
-import qualified Orphanarium.Test.Core.UniquePair
+import qualified Test.Orphanarium.Core.Property
+import qualified Test.Orphanarium.Core.UniquePair
 
 main :: IO ()
 main = orphanariumMain [
-    Orphanarium.Core.PropertyTest.tests
-  , Orphanarium.Test.Core.UniquePair.tests
+    Test.Orphanarium.Core.Property.tests
+  , Test.Orphanarium.Core.UniquePair.tests
   ]

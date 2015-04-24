@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Orphanarium.LensTest where
+module Test.Orphanarium.Lens where
 
 import           Orphanarium.Lens
 

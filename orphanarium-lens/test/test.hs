@@ -1,6 +1,6 @@
 import           Control.Monad
 
-import qualified Orphanarium.LensTest
+import qualified Test.Orphanarium.Lens
 
 import           System.Exit
 import           System.IO
@@ -9,5 +9,5 @@ import           System.IO
 main :: IO ()
 main =
   hSetBuffering stdout LineBuffering >> sequence [
-      Orphanarium.LensTest.tests
+      Test.Orphanarium.Lens.tests
     ] >>= \rs -> unless (and rs) exitFailure
