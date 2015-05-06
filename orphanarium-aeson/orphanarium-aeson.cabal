@@ -15,6 +15,7 @@ library
                        base                            >= 3          && < 5
                      , aeson                           == 0.8.*
                      , QuickCheck                      == 2.7.*
+                     , time
 
   ghc-options:
                        -Wall
@@ -26,6 +27,7 @@ library
   exposed-modules:
                        Paths_orphanarium_aeson
                        Orphanarium.Aeson
+                       Orphanarium.Aeson.Time
 
 test-suite test
   type:                exitcode-stdio-1.0
@@ -42,3 +44,4 @@ test-suite test
                      , orphanarium-aeson
                      , aeson
                      , QuickCheck
+                     , time
