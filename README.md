@@ -1,10 +1,8 @@
-orphanarium
-===========
+disorder
+========
 
 ```
-A place for various quickcheck bits and pieces.
+"Lights are flashing, cars are crashing, getting frequent now"
 ```
 
-![orphanrium](http://vignette1.wikia.nocookie.net/en.futurama/images/2/2b/Cookieville.jpg/revision/latest?cb=20060822152210)
-
-
+A small library of useful quickcheck generators, laws and other bits and pieces.

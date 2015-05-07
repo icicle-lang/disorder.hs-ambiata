@@ -2,7 +2,7 @@
 
 $(dirname $0)/ci.branches
 
-MODULES=$(ls orphanarium-*/*.cabal)
+MODULES=$(ls disorder-*/*.cabal)
 
 VERSION=$(date '+%Y%m%d%H%M%S')-$(git log --pretty=format:%h -n 1)
 
