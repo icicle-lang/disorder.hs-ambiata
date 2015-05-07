@@ -11,7 +11,7 @@ git submodule update
 
 # test everything
 
-MODULES=$(ls orphanarium-*/*.cabal)
+MODULES=$(ls disorder-*/*.cabal)
 
 for x in $MODULES; do
   (cd $(dirname $x) && ./cabal test) || exit $?
