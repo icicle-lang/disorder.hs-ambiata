@@ -1,11 +1,18 @@
 module Orphanarium.Core.Property where
 
-import Test.QuickCheck.Gen
-import Test.QuickCheck.Property
+import           Data.Text (Text, unpack)
+
+import           Test.QuickCheck.Gen
+import           Test.QuickCheck.Property
+
 
 infix 4 =/=
 (=/=) :: (Eq a, Show a) => a -> a -> Property
 x =/= y = counterexample (concat [show x, " == ", show y]) $ x /= y
+
+failWith :: Text -> Property
+failWith =
+  flip counterexample False . unpack
 
 -- |
 -- Allows you to negate a property and provide a string to hopefully give some clue as to what
