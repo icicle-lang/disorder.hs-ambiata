@@ -32,6 +32,8 @@ library
                        Disorder.Core.Main
                        Disorder.Core.Property
                        Disorder.Core.UniquePair
+                       Disorder.Core.NaturalInt
+                       Disorder.Core.PositiveInt
 
 test-suite test
   type:                exitcode-stdio-1.0

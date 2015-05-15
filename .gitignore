@@ -8,3 +8,4 @@ cabal-dev
 .virthualenv
 .cabal-sandbox
 cabal.sandbox.config
+.idea
