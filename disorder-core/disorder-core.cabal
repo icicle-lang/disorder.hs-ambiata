@@ -30,6 +30,7 @@ library
                        Disorder.Core
                        Disorder.Core.IO
                        Disorder.Core.Main
+                       Disorder.Core.OrdPair
                        Disorder.Core.Property
                        Disorder.Core.UniquePair
                        Disorder.Core.NaturalInt
