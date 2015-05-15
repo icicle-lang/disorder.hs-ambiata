@@ -28,6 +28,7 @@ library
   exposed-modules:
                        Paths_disorder_core
                        Disorder.Core
+                       Disorder.Core.Gen
                        Disorder.Core.IO
                        Disorder.Core.Main
                        Disorder.Core.OrdPair
