@@ -33,6 +33,7 @@ library
                        Disorder.Core.Main
                        Disorder.Core.OrdPair
                        Disorder.Core.Property
+                       Disorder.Core.Tripping
                        Disorder.Core.UniquePair
 
 test-suite test
