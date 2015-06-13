@@ -1,8 +1,9 @@
 module Disorder.Core (
-        module OC
-    ) where
+    module X
+  ) where
 
-import Disorder.Core.Gen as OC
-import Disorder.Core.OrdPair as OC
-import Disorder.Core.Property as OC
-import Disorder.Core.UniquePair as OC
+import           Disorder.Core.Gen as X
+import           Disorder.Core.OrdPair as X
+import           Disorder.Core.Property as X
+import           Disorder.Core.Tripping as X
+import           Disorder.Core.UniquePair as X
