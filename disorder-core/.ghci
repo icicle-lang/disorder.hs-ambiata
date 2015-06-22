@@ -1,3 +1,4 @@
-:set -XQuasiQuotes
-:set prompt ">> "
+:set prompt "λ> "
 :set -Wall
+:set -XOverloadedStrings
+:set -XScopedTypeVariables

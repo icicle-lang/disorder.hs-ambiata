@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module Test.Disorder.Core.Tripping where
 
@@ -12,6 +13,12 @@ prop_tripping =
 
 prop_tripping_neg =
   neg . property $ tripping id (const Nothing :: Int -> Maybe Int)
+
+prop_tripping_with =
+  trippingWith (==) id (Just :: Int -> Maybe Int)
+
+prop_tripping_with_neg =
+  neg . property $ trippingWith (==) id (const Nothing :: Int -> Maybe Int)
 
 return []
 tests = $quickCheckAll
