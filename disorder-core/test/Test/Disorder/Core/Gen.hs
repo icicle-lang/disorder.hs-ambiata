@@ -6,6 +6,8 @@ import           Disorder.Core.IO
 import           Disorder.Core.OrdPair
 
 import           Test.QuickCheck
+import           Data.Maybe
+import           Data.List (partition)
 
 
 prop_vectorOfSize :: OrdPair (Positive Int) -> Positive Int -> Property
@@ -23,7 +25,10 @@ prop_maybeGen = testIO $ do
   ma <- generate $ vectorOf 10000 (maybeGen (arbitrary :: Gen Int))
   -- not the best statistical test but we want to make sure that
   -- we have "enough" Nothings in the list
-  return $ (length . filter (== Nothing)) ma >= 2000
+  return $
+    let (justs, nothings) = partition isJust ma
+    in  (length justs >= 8000) .&.
+        (length nothings >= 100)
 
 return []
 tests :: IO Bool

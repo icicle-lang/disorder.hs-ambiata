@@ -7,7 +7,6 @@ module Disorder.Core.Gen (
 import           Test.QuickCheck.Gen
 import           Control.Applicative
 
-
 -- | Return a vector whose size is within the provided bounds
 vectorOfSize :: Int -> Int -> Gen a -> Gen [a]
 vectorOfSize min' max' gen =
@@ -18,9 +17,9 @@ chooseSize :: Int -> Int -> Gen Int
 chooseSize min' max' =
   sized (return . min max' . max min')
 
--- | from a generator return a generator that will generate Nothing
---   half the time and Just half the time
+-- | from a generator return a generator that will generate Nothing sometimes
 maybeGen :: Gen a -> Gen (Maybe a)
-maybeGen g = do
-  b <- elements [True, False]
-  if b then Just <$> g else elements [Nothing]
+maybeGen g = sized $ \s ->
+  frequency [
+    (1, return Nothing),
+    (s, Just <$> resize (s `div` 2) g)]
