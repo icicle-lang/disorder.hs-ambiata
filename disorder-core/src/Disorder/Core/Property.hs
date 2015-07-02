@@ -2,6 +2,8 @@ module Disorder.Core.Property where
 
 import           Data.Text (Text, unpack)
 
+import           Control.Monad.Trans.Either
+
 import           Test.QuickCheck.Gen
 import           Test.QuickCheck.Property
 
@@ -13,6 +15,29 @@ x =/= y = counterexample (concat [show x, " == ", show y]) $ x /= y
 failWith :: Text -> Property
 failWith =
   flip counterexample False . unpack
+
+-- |
+-- Allows you to keep all properties in EitherT all the way to the top.
+-- Great for testIO:
+-- prop_... = testIO . runOrFail $ do
+--
+runOrFail :: (Monad m) => EitherT Text m a -> m a
+runOrFail = (=<<) (either (fail . unpack) return) . runEitherT
+
+-- |
+-- Useful to check an EitherT is Right, eg:
+--   expectRight (awsErrorRender) $ runAWST ...
+--
+expectRight :: Functor m => (l -> Text) -> EitherT l m a -> EitherT Text m a
+expectRight err e = bimapEitherT (err) id $ e
+
+-- |
+-- Useful to check that an EitherT deliberately failed, and that is ok. eg:
+--   expectLeft "This shouldn't be allowed" $ runAWST...
+--
+expectLeft :: Functor m => f -> EitherT b m e -> EitherT f m b
+expectLeft err e =  bimapEitherT (const err) id $ swapEitherT e
+
 
 -- |
 -- Allows you to negate a property and provide a string to hopefully give some clue as to what
