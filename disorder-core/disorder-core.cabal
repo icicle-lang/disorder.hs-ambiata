@@ -37,6 +37,7 @@ library
                        Disorder.Core.Property
                        Disorder.Core.Tripping
                        Disorder.Core.UniquePair
+                       Disorder.Core.QuickCheck
 
 test-suite test
   type:                exitcode-stdio-1.0
