@@ -109,12 +109,11 @@ genReadFile = do
   return $ mkTransition "read line" `goif` anyClosedFile `goto` do
     fs <- get
     Just (fp, (File Nothing ls)) <- lift . pick $ pickClosedFile fs
-    let lc = L.length ls
     lift $ do
-      -- additional "precondition" check that the file is not empty
+      -- additional "precondition" check that the model file is not empty
       -- if it is empty the transition is discarded (no failure) see 'pre'
-      pre $ lc > 0
-      li <- pick $ choose (0, lc - 1)
+      pre $ ls /= []
+      (li, sl) <- pick . elements . L.zip [0..] $ ls
       -- opens file in continuations so it will be closed at the end of "do" block
       fl <- liftIO . (`runContT`return) $ do
         h <- withFileCont fp ReadMode
@@ -123,7 +122,6 @@ genReadFile = do
           replicateM_ li (hGetLine h)
           hGetLine h
       -- checks that the read line matches corresponding line from the model
-      let sl = ls L.!! li
       unless (fl == sl) $ fail (show fl <> " /= " <> show sl)
 
 -- | Invalid reading of file which may fail if the file is empty
