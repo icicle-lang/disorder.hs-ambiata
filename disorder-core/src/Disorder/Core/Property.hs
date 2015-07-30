@@ -1,6 +1,8 @@
 module Disorder.Core.Property where
 
-import           Data.Text (Text, unpack)
+import           Data.AEq                 (AEq)
+import qualified Data.AEq                 as AEQ
+import           Data.Text                (Text, unpack)
 
 import           Test.QuickCheck.Gen
 import           Test.QuickCheck.Property
@@ -9,6 +11,16 @@ import           Test.QuickCheck.Property
 infix 4 =/=
 (=/=) :: (Eq a, Show a) => a -> a -> Property
 x =/= y = counterexample (concat [show x, " == ", show y]) $ x /= y
+
+infix 4 ~~~
+
+-- | Approximately-equal property for floats and things that look like
+-- floats.
+(~~~) :: (AEq a, Show a) => a -> a -> Property
+x ~~~ y = counterexample cex prop
+  where
+    cex  = concat ["|", show x, " - ", show y, "| > ɛ"]
+    prop = x AEQ.~== y
 
 failWith :: Text -> Property
 failWith =
