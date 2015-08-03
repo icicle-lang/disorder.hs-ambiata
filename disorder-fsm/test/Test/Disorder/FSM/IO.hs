@@ -9,6 +9,9 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Class
 
+import           Control.Monad.Reader
+import           Control.Monad.State
+
 import           Disorder.FSM
 
 import           Test.QuickCheck
@@ -47,110 +50,120 @@ type Environment a = Stack a
 -- | Model state of the 'Stack' is just a list
 type Model a = [a]
 
-type StackTransition a = Transition (Environment a) (Model a) IO
+type StackTransition a = ReaderT (Environment a) (StateT (Model a) IO)
+
+runFileT :: StackTransition a b -> IO b
+runFileT x = do
+  e <- empty
+  flip evalStateT [] . flip runReaderT e $ x
 
 -- | Pushes random element to stack
-genPush :: Gen (StackTransition Int)
+genPush :: Gen (Transition (StackTransition Int) ())
 genPush = do
   a <- arbitrary
-  return $ mkTransition ("push " ++ show a) `goto` do
-    s <- ask
+  return . mkTransition ("push " ++ show a) $ do
+    s <- lift ask
     liftIO $ push s a
     -- updates the model
-    modify $ (a:)
+    lift . lift . modify $ (a:)
+
+-- | Pops an element from 'Stack'
+genPop :: Gen (Transition (StackTransition Int) ())
+genPop =
+  return . mkTransition "pop" $ do
+    s <- lift ask
+    l <- lift $ lift get
+    pre . not . null $ l
+    a <- liftIO $ pop s
+    assert (a == head l)
+    --  updates the Model
+    lift . lift . modify $ tail
 
 -- | Broken 'push' which doesn't actually push negative elements
-genInvalidPush :: Gen (StackTransition Int)
+genInvalidPush :: Gen (Transition (StackTransition Int) ())
 genInvalidPush = do
   a <- arbitrary
-  return $ mkTransition ("invalid_push " ++ show a) `goto` do
-    s <- ask
+  return $ mkTransition ("invalid_push " ++ show a) $ do
+    s <- lift ask
     -- | this is where it is brocken
     unless (a < 0) $ liftIO $ push s a
     -- | it does modify the model correctly (so it won't match the 'RealWorld')
-    modify $ (a:)
-
--- | Pops an element from 'Stack'
-genPop :: Gen (StackTransition Int)
-genPop =
-  return $ mkTransition "pop" `goif` (not . null) `goto` do
-    s <- ask
-    a <- liftIO $ pop s
-    l <- get
-    lift $ assert (a == head l)
-    -- updates the Model
-    modify $ tail
+    lift . lift . modify $ (a:)
 
 -- | Does not specify 'goif' pre-condition so the assertion can fail
 --   when it is executed with empty 'Stack'
-genInvalidPop :: Gen (StackTransition Int)
+genInvalidPop :: Gen (Transition (StackTransition Int) ())
 genInvalidPop =
-  return $ mkTransition "invalid_pop" `goto` do
-    s <- ask
-    l <- get
+  return . mkTransition "invalid_pop" $ do
+    s <- lift ask
+    l <- lift $ lift get
     -- this may 'fail'
-    lift $ assert (not . null $ l)
+    assert (not . null $ l)
     a <- liftIO $ pop s
     -- and this may 'fail' if the model is out of sync with 'RealWorld'
-    lift $ assert (a == head l)
-    modify $ tail
+    assert (a == head l)
+    lift . lift . modify $ tail
 
 -- | Does not specify 'goif' pre-condition so it may throw exception
-genPopException :: Gen (StackTransition Int)
+genPopException :: Gen (Transition (StackTransition Int) ())
 genPopException =
-  return $ mkTransition "invalid_pop" `goto` do
-    s <- ask
-    l <- get
+  return . mkTransition "invalid_pop" $ do
+    s <- lift ask
+    l <- lift $ lift get
     -- will throw exception on empty 'Stack'
     a <- liftIO $ pop s
-    lift $ assert (a == head l)
-    modify $ tail
+    assert (a == head l)
+    lift . lift . modify $ tail
 
 -- | Reads an element on 'Stack' top
-genTop :: Gen (StackTransition Int)
+genTop :: Gen (Transition (StackTransition Int) ())
 genTop =
-  return $ mkTransition "top" `goto` do
-    s <- ask
+  return $ mkTransition "top" $ do
+    s <- lift ask
     ma <- liftIO $ top s
-    l <- get
+    l <- lift $ lift get
     -- checks with model
     case (ma, l) of
-      (Just a, (x:_)) -> lift $ assert $ a == x
-      (Nothing, _) -> lift $ assert $ l == []
+      (Just a, (x:_)) -> assert $ a == x
+      (Nothing, _) -> assert $ l == []
       inv -> fail $ "invalid state: " <> show inv
 
-genSize :: Gen (StackTransition Int)
+genSize :: Gen (Transition (StackTransition Int) ())
 genSize =
-  return $ mkTransition "size" `goto` do
-    s <- ask
+  return $ mkTransition "size" $ do
+    s <- lift ask
     ss <- liftIO $ size s
-    l <- get
-    lift . assert $ ss == length l
+    l <- lift $ lift get
+    assert $ ss == length l
+
+
+testIO :: Testable a => IO a -> Property
+testIO = monadicIO . (=<<) stop . run
+
+testStack :: PropertyM (StackTransition a) b -> Property
+testStack =
+   monadic (testIO . runFileT)
 
 -- | Shall never fail since only correct transitions are used
 prop_success :: Property
-prop_success = monadicIO $ do
-  s <- liftIO empty
-  runFSM s [] . listOf . oneof $ [genPush, genPop, genTop, genSize]
+prop_success = testStack $ do
+  runFSM . listOf . oneof $ [genPush, genPop, genTop, genSize]
 
 -- | fails due to invalid 'pop'
 prop_pop_assert_error :: Property
-prop_pop_assert_error = expectFailure . monadicIO $ do
-  s <- liftIO empty
-  runFSM s [] . listOf . oneof $ [genPush, genInvalidPop, genTop, genSize]
+prop_pop_assert_error = expectFailure . testStack $
+  runFSM . listOf . oneof $ [genPush, genInvalidPop, genTop, genSize]
 
 -- | fails due to invalid 'push'
 prop_push_assert_error :: Property
-prop_push_assert_error = expectFailure . monadicIO $ do
-  s <- liftIO empty
-  runFSM s [] . listOf . oneof $ [genInvalidPush, genPush, genPop, genTop, genSize]
+prop_push_assert_error = expectFailure . testStack $
+  runFSM . listOf . oneof $ [genInvalidPush, genPush, genPop, genTop, genSize]
 
 -- | Produces "invalid" transition less frequently
 --   thus generating longer transition list
 prop_assert_error_longer_chain :: Property
-prop_assert_error_longer_chain = expectFailure . monadicIO $ do
-  s <- liftIO empty
-  runFSM s [] . vectorOf 100 . frequency $ [
+prop_assert_error_longer_chain = expectFailure . testStack $
+  runFSM . vectorOf 100 . frequency $ [
       (10, genPush)
     , (1, genInvalidPush)
     , (10, genTop)
@@ -161,9 +174,8 @@ prop_assert_error_longer_chain = expectFailure . monadicIO $ do
 
 -- | Fails due to exception with output identical to 'fail' failure
 prop_state_exception :: Property
-prop_state_exception =  expectFailure . monadicIO $ do
-  s <- liftIO empty
-  runFSM s [] . listOf . oneof $ [genPush, genPopException, genTop, genSize]
+prop_state_exception =  expectFailure . testStack $
+  runFSM . listOf . oneof $ [genPush, genPopException, genTop, genSize]
 
 
 return []

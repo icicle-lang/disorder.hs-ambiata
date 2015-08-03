@@ -45,6 +45,7 @@ test-suite test
                      , transformers
                      , mtl
                      , containers
+                     , exceptions
                      , temporary                      >= 1.1        && < 1.3
                      , QuickCheck
                      , disorder-fsm
