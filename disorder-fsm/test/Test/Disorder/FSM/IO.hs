@@ -173,6 +173,15 @@ prop_state_exception =  expectFailure . monadicIO $ do
   s <- liftIO empty
   runFSM s [] . oneof $ [genPush, genPopException, genTop, genSize]
 
+-- Doesn't look like it is possible to specify in QC
+-- that the test with 100 "Give up" results is a success
+-- commenting it out
+-- | Check that FSM testing doesn't stuck if there is no valid transitions available
+-- prop_no_valid_transition :: Property
+-- prop_no_valid_transition = expectFailure . monadicIO $ do
+--   s <- liftIO empty
+--   runFSM s [] genPop
+
 
 return []
 tests :: IO Bool

@@ -34,7 +34,9 @@ import           Prelude (Show(..))
 import           Data.Bool
 import           Data.Eq
 import           Data.Function
+import           Data.Maybe
 import           Data.Monoid
+import           Data.Ord
 import           Data.String
 import           Control.Exception.Base (AssertionFailed(..))
 import           Control.Monad
@@ -47,6 +49,7 @@ import           Test.QuickCheck as X hiding ((===))
 import           Test.QuickCheck.Monadic as X hiding (assert)
 
 import           Test.QuickCheck.Gen
+import           Test.QuickCheck.Property (rejected)
 
 
 -- | Defines a transition from state to state
@@ -124,21 +127,24 @@ infix 4 =/=
 x =/= y = (x /= y) `assertMsg` (show x <> " == " <> show y)
 
 
--- | Similar to 'runFSM' but can be used with 'ContT' monad
+-- | Similar to  'runFSM' but can be used with 'ContT' monad
 --   'ContT' does not define 'MonadCatch' instance, so it it cannot be passed to 'runFSM'
 runFSMCont :: (MonadCatch m, Show s) => r -> s -> Gen (Transition r s (ContT Property m)) -> PropertyM (ContT Property m) ()
 runFSMCont env state g = do
-  Positive n <- pickGen arbitrary
+  n <- pickGen . sized $ \k -> choose (1, 1 `max` k)
   void $ evalRWST (replicateM_ n go) env (state, mempty)
   where
     go = do
       (s, ts) <- get
-      t <- lift . pickGen $ g `suchThat` flip preCond s
-      put $ (s, ts <> formatState t s)
-      let m = RWST $ \r (s', ss') -> do
-           (a'', s'', w'') <- runRWST (runAction (transition t)) r s'
-           return (a'', (s'', ss'), w'')
-      m `handleRun` handleAssert `handleRun` handleException
+      mt <- lift . pickGen $ g `suchThatMaybe` flip preCond s
+      case mt of
+        Nothing -> lift $ stop rejected
+        Just t -> do
+          put $ (s, ts <> formatState t s)
+          let m = RWST $ \r (s', ss') -> do
+               (a'', s'', w'') <- runRWST (runAction (transition t)) r s'
+               return (a'', (s'', ss'), w'')
+          m `handleRun` handleAssert `handleRun` handleException
 
     handleRun (RWST m) h = RWST $ \r s@(_, w) ->
       m r s `catchPropCont` \e -> runRWST (h e w) r s
