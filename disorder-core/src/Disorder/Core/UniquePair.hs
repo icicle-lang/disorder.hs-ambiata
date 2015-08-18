@@ -10,8 +10,8 @@ import           Test.QuickCheck
 
 data UniquePair a =
   UniquePair {
-      fst :: a
-    , snd :: a
+      uniquePairFst :: a
+    , uniquePairSnd :: a
     } deriving (Eq, Show)
 
 instance (Arbitrary a, Eq a) => Arbitrary (UniquePair a) where
