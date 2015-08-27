@@ -14,7 +14,7 @@ library
   build-depends:
                        base                            >= 3          && < 5
                      , aeson                           == 0.8.*
-                     , disorder-core
+                     , ambiata-disorder-core
                      , QuickCheck                      == 2.7.*
                      , time
 
