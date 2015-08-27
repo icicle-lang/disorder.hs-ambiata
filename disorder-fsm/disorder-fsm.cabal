@@ -1,4 +1,4 @@
-name:                  disorder-fsm
+name:                  ambiata-disorder-fsm
 version:               0.0.1
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
@@ -25,7 +25,7 @@ library
 
 
   exposed-modules:
-                       Paths_disorder_fsm
+                       Paths_ambiata_disorder_fsm
                        Disorder.FSM
 
 test-suite test
@@ -42,4 +42,4 @@ test-suite test
                        base
                      , transformers
                      , QuickCheck
-                     , disorder-fsm
+                     , ambiata-disorder-fsm

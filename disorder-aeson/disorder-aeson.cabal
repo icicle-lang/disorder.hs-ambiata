@@ -1,4 +1,4 @@
-name:                  disorder-aeson
+name:                  ambiata-disorder-aeson
 version:               0.0.1
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
@@ -26,7 +26,7 @@ library
 
 
   exposed-modules:
-                       Paths_disorder_aeson
+                       Paths_ambiata_disorder_aeson
                        Disorder.Aeson
                        Disorder.Aeson.Time
 
@@ -42,7 +42,7 @@ test-suite test
 
   build-depends:
                        base                            >= 3          && < 5
-                     , disorder-aeson
+                     , ambiata-disorder-aeson
                      , aeson
                      , QuickCheck
                      , time

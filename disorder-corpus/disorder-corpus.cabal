@@ -1,4 +1,4 @@
-name:                  disorder-corpus
+name:                  ambiata-disorder-corpus
 version:               0.0.1
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
@@ -24,7 +24,7 @@ library
 
 
   exposed-modules:
-                       Paths_disorder_corpus
+                       Paths_ambiata_disorder_corpus
                        Disorder.Corpus
 
 test-suite test
@@ -39,6 +39,6 @@ test-suite test
 
   build-depends:
                        base                            >= 3          && < 5
-                     , disorder-corpus
+                     , ambiata-disorder-corpus
                      , text
                      , QuickCheck
