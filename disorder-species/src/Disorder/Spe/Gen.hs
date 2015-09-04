@@ -73,7 +73,6 @@ trees = sampleSpecies treesSpecies
 
 -- | species of rose trees
 treesSpecies :: Spe a (Tree a)
-treesSpecies [] = []
 treesSpecies as = (\(n, (_, ns)) -> Node n ns) <$> (x .*. (list `o` treesSpecies)) as
 
 -- | Generate a list of distinct elements

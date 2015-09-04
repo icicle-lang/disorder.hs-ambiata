@@ -5,6 +5,7 @@
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module Test.Disorder.Spe.Gen where
 
+import Control.Applicative
 import           Disorder.Spe.Gen
 
 import           Data.Foldable
@@ -25,8 +26,8 @@ prop_klists =
 prop_lists =
   forAll (elements [1..7]) $ \n ->
   forAll (lists [(1::Int)..n]) $ \l ->
-  collect l $
-  L.length l <= n
+    collect l $
+    L.length l <= n
 
 prop_ksets =
   forAll (elements [1..7]) $ \n ->
