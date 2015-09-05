@@ -2,6 +2,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DoAndIfThenElse #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Disorder.Spe.Gen (
   distinct
@@ -87,8 +88,10 @@ distinctWithGrowth k m ga =
     do
       n  <- sized return
       as <- L.take n . nub <$> vectorOf (k * n) ga
-      if L.length as < n then distinctWithGrowth (k + 1) m ga
-      else                    return as
+      if L.length as < n then
+        distinctWithGrowth (k + 1) m ga
+      else
+        return as
 
 -- | Generate elements from a species, given a set of labels
 --   using reservoir sampling to select a structure randomly

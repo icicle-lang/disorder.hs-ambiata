@@ -110,7 +110,7 @@ fromOrderedPairSpeciesStructure s =
 
 -- | recover a tree from a species element for trees
 fromTreeSpeciesStructure :: ((Id :*: Id) :*: Set) a -> Tree a
-fromTreeSpeciesStructure ((Id a :*: Id b) :*: _) = Node a []
+fromTreeSpeciesStructure ((Id a :*: Id _) :*: _) = Node a []
 
 ---------
 -- RANDOM

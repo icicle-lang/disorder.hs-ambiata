@@ -30,6 +30,8 @@ library
   exposed-modules:
                        Paths_disorder_species
                        Disorder.Species.Gen
+                       Disorder.Spe.Gen
+                       Disorder.Sp.Gen
 
 test-suite test
   type:                exitcode-stdio-1.0
