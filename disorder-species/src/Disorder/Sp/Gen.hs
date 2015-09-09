@@ -52,16 +52,22 @@ type BiPar a = Sp a ([a], [a])
       | otherwise = Right <$> i2 k (c2 n) us
 
 (.*.) :: Sp a b -> Sp a c -> Sp a (b, c)
-(.*.) (Sp e1 c1 i1) (Sp e2 c2 i2) = Sp e c i
-    where
-      e us = enum biparB us >>= \(vs, zs) -> (,) <$> e1 vs <*> e2 zs
+(.*.) = mul biparB
 
-      c n = let cbl = card biparB n
+(<*.) :: Sp a b -> Sp a c -> Sp a (b, c)
+(<*.) = mul biparL
+
+mul :: BiPar a -> Sp a b -> Sp a c -> Sp a (b,c)
+mul (Sp bpe bpc bpi) (Sp e1 c1 i1) (Sp e2 c2 i2) = Sp e c i
+  where
+      e us = bpe us >>= \(vs, zs) -> (,) <$> e1 vs <*> e2 zs
+
+      c n = let cbl = bpc n
              in sum $ (\k -> c1 k * c2 (cbl - k)) <$> [1..cbl]
 
       i n k us =
         do
-          ((vs, zs), j) <- findMulPartitionFromIndex n k c1 c2 us
+          ((vs, zs), j) <- findMulPartitionFromIndex n k bpi c1 c2 us
           let (lv, lz) = (toInteger . length $ vs, toInteger . length $ zs)
           let (b, p) = j `quotRem` max 1 (lv * lz)
           let vs1 = i1 lv b vs
@@ -71,15 +77,16 @@ type BiPar a = Sp a ([a], [a])
 -- | simple linear search
 findMulPartitionFromIndex
   :: Integer  -- number of elements
-  -> Integer  -- index .*.
+  -> Integer  -- index
+  -> (Integer -> Integer -> [a] -> Maybe ([a], [a])) -- partition index function
   -> (Integer -> Integer) -- card1
   -> (Integer -> Integer) -- card2
   -> [a]                  -- labels
   -> Maybe (([a], [a]), Integer)  -- result
-findMulPartitionFromIndex n k c1 c2 us =
+findMulPartitionFromIndex n k indexFunction c1 c2 us =
   go 0 k
   where go l j =
-          do (p1, p2) <- fromIndex biparB n l us
+          do (p1, p2) <- indexFunction n l us
              let c = max (c1 (toInteger $ length p1) * c2 (toInteger $ length p2)) 1
              if j < c then return ((p1, p2), j)
              else go (l + 1) (j - c)
@@ -100,26 +107,6 @@ findPartitionFromIndex n k us
             do
               (vs, zs) <- findPartitionFromIndex (n - 1) (k - card biparB (n - 1)) (dropLast labels)
               return (vs ++ [final], zs)
-
-(<*.) :: Sp a b -> Sp a c -> Sp a (b, c)
-(<*.) (Sp e1 c1 i1) (Sp e2 c2 i2) = Sp e c i
-    where
-      e us = enum biparL us >>= \(vs, zs) -> (,) <$> e1 vs <*> e2 zs
-
-      c n = let cbl = card biparL n
-             in sum $ (\k -> c1 k * c2 (cbl - k)) <$> [1..cbl]
-
-      i n k us =
-        do
-          (l, j)   <- findLevelIndex n k (\v -> c1 v * c2 (n-v)) -- l is the size of the first partition
-          let (vs, zs) = splitAt (fromInteger l) us
-          -- j is the index of the product based on that length
-          -- there are card biparL l such products and each has (c1 l * c2 (n-l)) possibilities
-          let (p, q) = j `quotRem` (c1 l * c2 (n-l))
-          let vs1 = i1 l p vs
-              zs1 = i2 (n - l) q zs
-           in  (,) <$> vs1 <*> zs1
-
 
 fromIndexInPartitionB
   :: Integer          -- full size
@@ -203,15 +190,6 @@ biparL = Sp e c i
       | otherwise        = first ((:) u) <$> i (l - 1) (j - 1) ut
     i 0 0 [] = Just ([], [])
     i _ _ [] = Nothing
-
-mul :: BiPar a -> Sp a b -> Sp a c -> Sp a (b,c)
--- mul h f g us = h us >>= \(vs,zs) -> (,) <$> f vs <*> g zs
-mul (Sp bpe bpc bpi) (Sp e1 c1 i1) (Sp e2 c2 i2) = Sp e c i
-  where
-    e us = bpe us >>= \(vs, zs) -> (,) <$> e1 vs <*> e2 zs
-    c n = bpc n * undefined
-    i = undefined
-
 
 set :: Sp a [a]
 set = Sp e c i
