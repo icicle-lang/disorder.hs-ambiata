@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 module Test.Disorder.Sp.Gen where
 
@@ -23,8 +24,10 @@ indexing (Sp e _ i) (Positive k) as =
      if k >= toInteger (length values) then Nothing
      else Just (values !! fromInteger k)
 
-species sp k as =
-  cardinality sp as .&&. indexing sp k as
+species :: (Arbitrary PositiveSmall, Arbitrary (Positive Integer), Eq b, Show b) =>
+           Sp Int b -> PositiveSmall -> Positive Integer -> Property
+species sp (PositiveSmall n) k =
+  cardinality sp [1..n] .&&. indexing sp k [1..n]
 
 prop_findLevelIndex (Positive n) (Positive k) (Positive a)=
   let c m = a * m
@@ -34,15 +37,19 @@ prop_findLevelIndex (Positive n) (Positive k) (Positive a)=
 
 prop_one = species (one :: Sp Int [Int])
 
-prop_set (PositiveSmall n) k = species (set :: Sp Int [Int]) k [1..n]
+prop_set = species (set :: Sp Int [Int])
 
-prop_biparL (PositiveSmall n) k = species biparL k [1..n]
+prop_biparL = species biparL
 
-prop_biparB (PositiveSmall n) k = species biparB k [1..n]
+prop_biparB = species biparB
 
-prop_ordMul (PositiveSmall n) k = species (set <*. set) k [1..n]
+prop_ordMul = species (set <*. set)
 
-prop_mul (PositiveSmall n) k = species (set .*. set) k [1..n]
+prop_mul = species (set .*. set)
+
+prop_nonEmptyList = species nonEmptyList
+
+prop_list = species list
 
 prop_fromIndexInPartitionB (PositiveSmall n) (Positive k) = forAll (choose (0, n)) $ \l ->
   let values = filter ((== l) . length . fst) (enum biparB [1..n]) :: [([Int], [Int])]
@@ -58,7 +65,7 @@ data PositiveSmall =
   deriving (Eq, Show)
 
 instance Arbitrary PositiveSmall where
-  arbitrary = PositiveSmall <$> choose (1, 10)
+  arbitrary = PositiveSmall <$> choose (1, 5)
 
 ----------
 -- HELPERS

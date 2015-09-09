@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Disorder.Sp.Gen (
   Sp(..)
@@ -8,16 +9,23 @@ module Disorder.Sp.Gen (
 , (<*.)
 , biparB
 , biparL
+, ckn
+, dropLast
+, fac
 , findLevelIndex
 , fromIndexInPartitionB
 , findPartitionFromIndex
 , findMulPartitionFromIndex
+, idSp
+, isOfLength
+, list
 , mul
+, nonEmptyList
 , one
+, ofSize
 , set
-, dropLast
-, ckn
-, fac
+, singleton
+, x
 ) where
 
 import           Control.Applicative
@@ -40,6 +48,12 @@ data Sp a c = Sp {
      -> Maybe c -- structure
 }
 
+instance Functor (Sp a) where
+  fmap f (Sp e1 c1 i1) = Sp e c i
+    where e = (f <$>) . e1
+          c = c1
+          i n k us = f <$> i1 n k us
+
 type BiPar a = Sp a ([a], [a])
 
 (.+.) :: Sp a b -> Sp a c -> Sp a (Either b c)
@@ -47,9 +61,9 @@ type BiPar a = Sp a ([a], [a])
   where
     e us = (Left <$> e1 us) ++ (Right <$> e2 us)
     c n = c1 n + c2 n
-    i k n us
-      | k < c1 n  = Left <$> i1 k (c1 n) us
-      | otherwise = Right <$> i2 k (c2 n) us
+    i n k us
+      | k < c1 n  = Left  <$> i1 n k us
+      | otherwise = Right <$> i2 n (k - c1 n) us
 
 (.*.) :: Sp a b -> Sp a c -> Sp a (b, c)
 (.*.) = mul biparB
@@ -58,36 +72,38 @@ type BiPar a = Sp a ([a], [a])
 (<*.) = mul biparL
 
 mul :: BiPar a -> Sp a b -> Sp a c -> Sp a (b,c)
-mul (Sp bpe bpc bpi) (Sp e1 c1 i1) (Sp e2 c2 i2) = Sp e c i
+mul bipar@(Sp bpe bpc _) sp1 sp2 = Sp e c i
   where
-      e us = bpe us >>= \(vs, zs) -> (,) <$> e1 vs <*> e2 zs
+      e us = bpe us >>= \(vs, zs) -> (,) <$> enum sp1 vs <*> enum sp2 zs
 
       c n = let cbl = bpc n
-             in sum $ (\k -> c1 k * c2 (cbl - k)) <$> [1..cbl]
+             in if n == 0 then 1 else sum $ (\k -> card sp1 k * card sp2 (cbl - k)) <$> [1..cbl]
 
       i n k us =
         do
-          ((vs, zs), j) <- findMulPartitionFromIndex n k bpi c1 c2 us
+          ((vs, zs), j) <- findMulPartitionFromIndex n k bipar (card sp1) (card sp2) us
           let (lv, lz) = (toInteger . length $ vs, toInteger . length $ zs)
-          let (b, p) = j `quotRem` max 1 (lv * lz)
-          let vs1 = i1 lv b vs
-              zs1 = i2 lz p zs
-           in  (,) <$> vs1 <*> zs1
+          let (cv, cz) = (card sp1 lv, card sp2 lz)
+          let (b, p) = j `quotRem` (cv * cz)
+          let v1 = fromIndex sp1 lv b vs
+              z1 = fromIndex sp2 lz p zs
+           in  (,) <$> v1 <*> z1
 
 -- | simple linear search
 findMulPartitionFromIndex
   :: Integer  -- number of elements
   -> Integer  -- index
-  -> (Integer -> Integer -> [a] -> Maybe ([a], [a])) -- partition index function
+  -> BiPar a    -- partition Species
   -> (Integer -> Integer) -- card1
   -> (Integer -> Integer) -- card2
   -> [a]                  -- labels
   -> Maybe (([a], [a]), Integer)  -- result
-findMulPartitionFromIndex n k indexFunction c1 c2 us =
+findMulPartitionFromIndex n k bipar c1 c2 us =
   go 0 k
   where go l j =
-          do (p1, p2) <- indexFunction n l us
-             let c = max (c1 (toInteger $ length p1) * c2 (toInteger $ length p2)) 1
+          if l > card bipar n then Nothing else
+          do (p1, p2) <- fromIndex bipar n l us
+             let c = c1 (toInteger $ length p1) * c2 (toInteger $ length p2)
              if j < c then return ((p1, p2), j)
              else go (l + 1) (j - c)
 
@@ -154,8 +170,6 @@ findLevelIndex n k c = go k 0
          | j < c l   = Just (l, j)
          | otherwise = go (j - c l) (l + 1)
 
-
-
 biparB :: BiPar a
 biparB = Sp e c i
   where
@@ -191,6 +205,19 @@ biparL = Sp e c i
     i 0 0 [] = Just ([], [])
     i _ _ [] = Nothing
 
+list :: Sp a [a]
+list = either (const []) id <$> one .+. nonEmptyList
+
+nonEmptyList :: Sp a [a]
+nonEmptyList =
+  let nel = uncurry (:) <$> x .*. list :: Sp a [a]
+      e = enum nel
+      c n = if n == 0 then 0 else fac n
+      i 0 _ _ = Nothing
+      i 1 0 (a:_) = Just [a]
+      i n k us = fromIndex nel n k us
+  in Sp e c i
+
 set :: Sp a [a]
 set = Sp e c i
   where
@@ -204,15 +231,50 @@ set = Sp e c i
 one :: Sp a [b]
 one = Sp e c i
   where
-    e us = case us of
-      []  -> []
-      [_] -> [[]]
-      _   -> []
+    e [] = [[]]
+    e _ = []
 
-    c n = case n of
-      0 -> 0
-      1 -> 1
-      _ -> 0
+    c n = if n == 0 then 1 else 0
 
-    i _ 0 (_:_) = Just []
+    i 0 0 _ = Just []
     i _ _ _     = Nothing
+
+singleton :: Sp a a
+singleton = x
+
+x :: Sp a a
+x =
+  let e [a] = [a]
+      e _ = []
+
+      c n = if n == 1 then 1 else 0
+
+      i 1 0 (a:_) = Just a
+      i _ _ _ = Nothing
+  in  Sp e c i
+
+
+idSp :: Sp a a
+idSp = Sp e c i
+  where
+    e = id
+    c n = n
+    i _ _ = listToMaybe
+
+-- Like length us == n, but lazy.
+isOfLength :: [a] -> Integer -> Bool
+isOfLength [] n = n == 0
+isOfLength (_:us) n = n > 0 && us `isOfLength` (n-1)
+
+-- | f `ofSize` n is like f on n element sets, but empty otherwise.
+ofSize :: Sp a c -> Integer -> Sp a c
+ofSize (Sp e1 c1 i1) n = Sp e c i
+  where
+    e us =
+      let values = e1 us
+      in  if values `isOfLength` n then values
+          else []
+
+    c k = if k == n then c1 k else 0
+
+    i l k us = if l == n then i1 l k us else Nothing
