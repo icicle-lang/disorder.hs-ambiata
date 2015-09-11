@@ -14,6 +14,8 @@ library
   build-depends:
                        base                            >= 3          && < 5
                      , transformers                    >= 0.3        && < 0.5
+                     , mtl                             >= 2.1        && < 2.3
+                     , containers                      >= 0.5        && < 0.7
                      , exceptions                      == 0.8.*
                      , QuickCheck                      == 2.7.*
 
@@ -41,5 +43,8 @@ test-suite test
   build-depends:
                        base
                      , transformers
+                     , mtl
+                     , containers
+                     , temporary                      >= 1.1        && < 1.3
                      , QuickCheck
                      , ambiata-disorder-fsm
