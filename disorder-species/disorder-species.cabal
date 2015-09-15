@@ -13,12 +13,15 @@ description:           disorder-species.
 library
   build-depends:
                        base                            >= 3          && < 5
+                     , array                           == 0.5.*
                      , containers                      == 0.5.*
-                     , species                         == 0.3.*
-                     , spe                             == 0.6.*
+                     , ListZipper                      == 1.2.*
+                     , monad-loops                     == 0.4.*
                      , numeric-prelude                 == 0.4.*
                      , QuickCheck
                      , random
+                     , species                         == 0.3.*
+                     , spe                             == 0.6.*
                      , transformers
 
   ghc-options:
@@ -31,7 +34,9 @@ library
                        Paths_disorder_species
                        Disorder.Species.Gen
                        Disorder.Spe.Gen
+                       Disorder.Sp.Combinatorial
                        Disorder.Sp.Gen
+                       Disorder.Sp.ST
 
 test-suite test
   type:                exitcode-stdio-1.0
@@ -47,9 +52,9 @@ test-suite test
                        base                            >= 3          && < 5
                      , disorder-species
                      , directory                       == 1.2.*
-                     , text
                      , process                         == 1.2.*
                      , QuickCheck
                      , quickcheck-instances            == 0.3.*
                      , species                         == 0.3.*
                      , spe                             == 0.6.*
+                     , text

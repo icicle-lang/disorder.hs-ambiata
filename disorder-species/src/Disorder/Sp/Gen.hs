@@ -7,32 +7,40 @@ module Disorder.Sp.Gen (
 , (.+.)
 , (.*.)
 , (<*.)
+, (><)
+, (>.<)
 , biparB
+, biparC
 , biparL
-, ckn
-, dropLast
-, fac
+, bool
+, fenum
 , findLevelIndex
-, fromIndexInPartitionB
-, findPartitionFromIndex
 , findMulPartitionFromIndex
 , idSp
 , isOfLength
+, kpartitions
 , list
 , mul
 , nonEmptyList
+, o
 , one
 , ofSize
+, partitions
 , set
 , singleton
 , x
 ) where
 
+import           Disorder.Sp.Combinatorial
+
 import           Control.Applicative
 import           Control.Arrow (first, second)
+import           Control.Monad
+
+import           Data.List as L
 import           Data.Maybe
-import           Data.List
-import           Prelude
+
+import           Prelude hiding (pi)
 
 data Sp a c = Sp {
   -- enumerate all the structures from a given set of labels
@@ -53,6 +61,10 @@ instance Functor (Sp a) where
     where e = (f <$>) . e1
           c = c1
           i n k us = f <$> i1 n k us
+
+instance Applicative (Sp a) where
+  pure a = const a <$> one
+  f <*> s = uncurry ($) <$> (f .*. s)
 
 type BiPar a = Sp a ([a], [a])
 
@@ -89,103 +101,96 @@ mul bipar@(Sp bpe bpc _) sp1 sp2 = Sp e c i
               z1 = fromIndex sp2 lz p zs
            in  (,) <$> v1 <*> z1
 
--- | simple linear search
-findMulPartitionFromIndex
-  :: Integer  -- number of elements
-  -> Integer  -- index
-  -> BiPar a    -- partition Species
-  -> (Integer -> Integer) -- card1
-  -> (Integer -> Integer) -- card2
-  -> [a]                  -- labels
-  -> Maybe (([a], [a]), Integer)  -- result
-findMulPartitionFromIndex n k bipar c1 c2 us =
-  go 0 k
-  where go l j =
-          if l > card bipar n then Nothing else
-          do (p1, p2) <- fromIndex bipar n l us
-             let c = c1 (toInteger $ length p1) * c2 (toInteger $ length p2)
-             if j < c then return ((p1, p2), j)
-             else go (l + 1) (j - c)
+o :: Sp [a] b -> Sp a c -> Sp a (b, [c])
+o sp1 sp2 = Sp e c i
+  where
+    e us = enum partitions us >>= enum sp1 >.< mapM (enum sp2)
 
+    c _ = 0
+    i _ _ _ = Nothing
 
-findPartitionFromIndex :: Integer -> Integer -> [a] -> Maybe ([a], [a])
-findPartitionFromIndex n k us
-  | k >= card biparB n = Nothing
-  | n == 0 = Nothing
-  | otherwise =
-      let labels = take (fromInteger n) us
-          final = last labels
-      in  if k < card biparB (n - 1) then
-            do
-              (vs, zs) <- findPartitionFromIndex (n - 1) k (dropLast labels)
-              return (vs, zs ++ [final])
-          else
-            do
-              (vs, zs) <- findPartitionFromIndex (n - 1) (k - card biparB (n - 1)) (dropLast labels)
-              return (vs ++ [final], zs)
+-- | The Cartesian product of two species.
+(><) :: Sp a b -> Sp a c -> Sp a (b, c)
+(><) f g = (,) <$> f <*> g
 
-fromIndexInPartitionB
-  :: Integer          -- full size
-  -> Integer          -- size of the smallest partition
-  -> Integer          -- index
-  -> [a]              -- set of labels
-  -> Maybe ([a], [a]) -- result
-fromIndexInPartitionB n l k us
-  | k >= ckn l n = Nothing
-  | n == 0 = Just ([], [])
-  | l == n = Just (take (fromInteger n) us, [])
-  | l == 0 = Just ([], take (fromInteger n) us)
-  | otherwise =
-     let labels = take (fromInteger n) us
-         final = last labels
-     in  if k < ckn l (n - 1) then
-           do
-             (vs, zs) <- fromIndexInPartitionB (n - 1) l k (dropLast labels)
-             return (vs, zs ++ [final])
-         else
-           do
-             (vs, zs) <- fromIndexInPartitionB (n - 1) (l - 1) (k - ckn l (n - 1)) (dropLast labels)
-             return (vs ++ [final], zs)
+-- | The Cartesian product of two enumerations.
+(>.<) :: ([a] -> [b]) -> ([a] -> [c]) -> [a] -> [(b, c)]
+(>.<) f g us = (,) <$> f us <*> g us
 
-dropLast :: [a] -> [a]
-dropLast = reverse . drop 1 . reverse
+fenum :: Sp a b -> [a] -> [b]
+fenum (Sp _ c i) as =
+  let las = toInteger . length $ as
+  in  concatMap (\k -> maybeToList $ i las (toInteger k) as) [0..(c las - 1)]
 
-ckn :: Integer  -> Integer -> Integer
-ckn k n = product [(n-k+1)..n] `quot` fac k
+-- | The species of set partitions.
+partitions :: Sp a [[a]]
+partitions = Sp e c i
+  where
+    e [] = []
+    e us =
+      let s = toInteger . length $ us
+      in  concatMap (\n -> enum (kpartitions n) us) [1..s]
 
-fac :: Integer -> Integer
-fac n = if n <= 1 then 1 else n * fac (n - 1)
+    c n = sum $ (`ckn2` n) <$> [0..n]
 
+    i n k us =
+      do
+        (l, j) <- findLevelIndex n k (\r -> card (kpartitions r) n)
+        fromIndex (kpartitions l) n j us
 
--- for a given index, size and cardinality function find
--- the level and the index of the level
-findLevelIndex
-  :: Integer                  -- level
-  -> Integer                  -- index
-  -> (Integer -> Integer)     -- cardinality function
-  -> Maybe (Integer, Integer) --
-findLevelIndex n k c = go k 0
-  where go j l
-         | l > n     = Nothing
-         | j < c l   = Just (l, j)
-         | otherwise = go (j - c l) (l + 1)
+-- | The species of set partitions having exactly p partitions
+kpartitions :: Integer -> Sp a [[a]]
+kpartitions k = Sp e c i
+  where
+    e us =
+      let n = length us
+          pms = firstPartitionSet n (fromInteger k)
+      in  (partitionSetToPartition us . fmap fst) <$> unfoldr' (nextPartitionSet n (fromInteger k)) pms
+
+    c = ckn2 k
+
+    i _ _ _ = Nothing
 
 biparB :: BiPar a
 biparB = Sp e c i
   where
-    e [] = [([], [])]
-    e (u:ut) = e ut >>= \(vs, zs) -> [(vs, u:zs), (u:vs, zs)]
+    e us =
+      concatMap (\l -> enum (biparC (toInteger l)) us) [0..(length us)]
 
     c n = 2 ^ n
 
-    i l j us@(u:ut)
-      | l == 0 = i j l us
-      | l == 1 && j == 0 = Just ([], [u])
-      | l == 1 && j == 1 = Just ([u], [])
-      | even j           = second ((:) u) <$> i (l - 1) (j `quot` 2) ut
-      | otherwise        = first ((:) u)  <$> i (l - 1) (j `quot` 2) ut
-    i 0 0 [] = Just ([], [])
-    i _ _ [] = Nothing
+    i n k us =
+      do
+        (l, j) <- findLevelIndex n k (\r -> card (biparC r) n)
+        fromIndex (biparC l) n j us
+
+-- bipartitions of size == l for the first list
+biparC :: Integer -> BiPar a
+biparC l = Sp e c i
+  where
+    e [] = [([], []) | l == 0]
+    e (u:ut) =
+      (first (u:)  <$> enum (biparC (l - 1)) ut) ++
+      (second (u:) <$> enum (biparC l) ut)
+
+    c = ckn (toInteger l)
+
+    i n k us
+      | l > n = Nothing
+      | k >= c n = Nothing
+      | n == 0 = Just ([], [])
+      | l == n = Just (take (fromInteger n) us, [])
+      | l == 0 = Just ([], take (fromInteger n) us)
+      | otherwise =
+         let labels = take (fromInteger n) us
+         in  if k < ckn (l - 1) (n - 1) then
+               do
+                 (vs, zs) <- fromIndex (biparC (l - 1)) (n - 1) k (drop 1 labels)
+                 return (head labels : vs, zs)
+             else
+               do
+                 (vs, zs) <- fromIndex (biparC l) (n - 1) (k - ckn (l - 1 ) (n - 1)) (drop 1 labels)
+                 return (vs, head labels : zs)
 
 biparL :: BiPar a
 biparL = Sp e c i
@@ -227,6 +232,17 @@ set = Sp e c i
     i _ 0 us = Just us
     i _ _ _  = Nothing
 
+bool :: Sp a Bool
+bool = Sp e c i
+  where e []  = [True]
+        e [_] = [False]
+        e _   = []
+
+        c n = if n <= 1 then 1 else 0
+
+        i 1 0 _ = Just True
+        i 1 1 _ = Just False
+        i _ _ _ = Nothing
 
 one :: Sp a [b]
 one = Sp e c i
@@ -237,7 +253,7 @@ one = Sp e c i
     c n = if n == 0 then 1 else 0
 
     i 0 0 _ = Just []
-    i _ _ _     = Nothing
+    i _ _ _ = Nothing
 
 singleton :: Sp a a
 singleton = x
@@ -270,11 +286,39 @@ isOfLength (_:us) n = n > 0 && us `isOfLength` (n-1)
 ofSize :: Sp a c -> Integer -> Sp a c
 ofSize (Sp e1 c1 i1) n = Sp e c i
   where
-    e us =
-      let values = e1 us
-      in  if values `isOfLength` n then values
-          else []
+    e us = if us `isOfLength` n then e1 us else []
 
     c k = if k == n then c1 k else 0
 
     i l k us = if l == n then i1 l k us else Nothing
+
+-- for a given index, size and cardinality function find
+-- the level and the index of the level
+findLevelIndex
+  :: Integer                  -- size
+  -> Integer                  -- index
+  -> (Integer -> Integer)     -- cardinality function
+  -> Maybe (Integer, Integer) --
+findLevelIndex n k c = go k 0
+  where go j l
+         | l > n     = Nothing
+         | j < c l   = Just (l, j)
+         | otherwise = go (j - c l) (l + 1)
+
+-- | simple linear search
+findMulPartitionFromIndex
+  :: Integer  -- total number of elements
+  -> Integer  -- index
+  -> BiPar a    -- partition Species
+  -> (Integer -> Integer) -- card1
+  -> (Integer -> Integer) -- card2
+  -> [a]                  -- labels
+  -> Maybe (([a], [a]), Integer)  -- result
+findMulPartitionFromIndex n k bipar c1 c2 us =
+  go 0 k
+  where go l j =
+          if l > card bipar n then Nothing else
+          do (p1, p2) <- fromIndex bipar n l us
+             let c = c1 (toInteger $ length p1) * c2 (toInteger $ length p2)
+             if j < c then return ((p1, p2), j)
+             else go (l + 1) (j - c)

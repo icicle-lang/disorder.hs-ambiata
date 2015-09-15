@@ -24,10 +24,21 @@ indexing (Sp e _ i) (Positive k) as =
      if k >= toInteger (length values) then Nothing
      else Just (values !! fromInteger k)
 
+fastIndexing sp@(Sp _ _ i) (Positive k) as =
+  label "fast indexing" $
+  let values = fenum sp as
+  in i (toInteger $ length as) k as ===
+     if k >= toInteger (length values) then Nothing
+     else Just (values !! fromInteger k)
+
 species :: (Arbitrary PositiveSmall, Arbitrary (Positive Integer), Eq b, Show b) =>
            Sp Int b -> PositiveSmall -> Positive Integer -> Property
 species sp (PositiveSmall n) k =
-  cardinality sp [1..n] .&&. indexing sp k [1..n]
+  conjoin [
+    cardinality  sp [1..n]
+  , indexing     sp k [1..n]
+  , fastIndexing sp k [1..n]
+  ]
 
 prop_findLevelIndex (Positive n) (Positive k) (Positive a)=
   let c m = a * m
@@ -43,6 +54,8 @@ prop_biparL = species biparL
 
 prop_biparB = species biparB
 
+prop_kpartitions (PositiveSmall k) = species (kpartitions (toInteger k))
+
 prop_ordMul = species (set <*. set)
 
 prop_mul = species (set .*. set)
@@ -51,11 +64,9 @@ prop_nonEmptyList = species nonEmptyList
 
 prop_list = species list
 
-prop_fromIndexInPartitionB (PositiveSmall n) (Positive k) = forAll (choose (0, n)) $ \l ->
-  let values = filter ((== l) . length . fst) (enum biparB [1..n]) :: [([Int], [Int])]
-      actual = fromIndexInPartitionB (toInteger n) (toInteger l) (toInteger k) [1..]
-  in  if k >= length values then actual === Nothing
-      else                       actual === Just (values !! k)
+prop_bool = species bool
+
+prop_biparC (PositiveSmall l) = species (biparC (toInteger l))
 
 containsAll :: Eq a => [a] -> [a] -> Bool
 containsAll as = all (`elem` as)
