@@ -2,10 +2,17 @@ module Disorder.Core.Gen (
     vectorOfSize
   , chooseSize
   , maybeGen
+  -- * re-exports from quickcheck-text
+  , genValidUtf8
+  , genValidUtf81
+  , utf8BS
+  , utf8BS1
   ) where
 
-import           Test.QuickCheck.Gen
 import           Control.Applicative
+
+import           Test.QuickCheck.Gen
+import           Test.QuickCheck.Utf8
 
 -- | Return a vector whose size is within the provided bounds
 vectorOfSize :: Int -> Int -> Gen a -> Gen [a]
