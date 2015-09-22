@@ -34,33 +34,8 @@ import           Data.Maybe
 
 import           Prelude hiding (pi, read)
 
-intPartitions :: Int -> [[Int]]
-intPartitions n =
-  F.toList $ runST $
-    do let asr = newArray (0, n + 1) 0
-       as     <- asr
-       kr     <- newSTRef 1
-       result <- newSTRef []
-       writeArray as 1 n
-
-       whileM_ (ap1 (/= 0) kr) $
-         do k_  <- readSTRef kr
-            ak1 <- readArray as (k_ - 1)
-            ak  <- readArray as k_
-            xr  <- newSTRef (ak1 + 1) -- a[k-1] + 1
-            yr  <- newSTRef (ak  - 1) -- a[k] - 1
-            kr  -= 1
-
-            whileM_ (ap2 (<=) xr yr) $
-              do k' <- readSTRef kr
-                 x  <- readSTRef xr
-                 writeArray as k' x
-                 yr -= x
-                 kr += 1
-            writeST as kr (ap2 (+) xr yr)
-            current <- arrayToList as kr
-            result .= (current :)
-       val result
+intPartitions :: Integer -> [[Integer]]
+intPartitions n = concatMap (kintPartitions n) [1..n]
 
 kintPartitions :: Integer -> Integer -> [[Integer]]
 kintPartitions n k =
@@ -74,10 +49,10 @@ kintPartitions n k =
           | x1 > x2 + 1 = Just (x1 - 1 : x2 + 1 : xs)
           | x1 == x2 = (x1:) <$> step (x2:xs)
           | x1 == x2 + 1 =
-             let (before, after) = partition (\x2 -> x2 + 1 == x1) (x2:xs)
-             in  case after of
+             let (minusOne, minusMore) = partition (\x -> x + 1 == x1) (x2:xs)
+             in  case minusMore of
                    [] -> Nothing
-                   (x3:xs') -> Just $ (x1 - 1) : before ++ [x3 + 1] ++ xs'
+                   (x3:rest) -> Just $ (x1 - 1) : minusOne ++ (x3 + 1 : rest)
 
 firstPartitionSet :: Int -> Int -> ([Int], [Int])
 firstPartitionSet n k =

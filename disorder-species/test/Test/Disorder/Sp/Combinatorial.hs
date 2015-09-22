@@ -13,8 +13,10 @@ import           Test.QuickCheck
 import           Test.Disorder.Sp.Arbitraries
 
 prop_kintPartitions (PositiveIntegerSmall n) = forAll (choose (1, n)) $ \k ->
+  let kints = kintPartitions n k in
   conjoin [
-    all (== n) (sum <$> kintPartitions n k)
+    all ((== n) . sum) kints
+  , all ((== fromInteger k) . length) kints
   ]
 
 --
