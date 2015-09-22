@@ -15,7 +15,9 @@ library
                        base                            >= 3          && < 5
                      , array                           == 0.5.*
                      , containers                      == 0.5.*
+                     , cond                            == 0.0.*
                      , ListZipper                      == 1.2.*
+                     , memoize                         == 0.7.*
                      , monad-loops                     == 0.4.*
                      , numeric-prelude                 == 0.4.*
                      , QuickCheck
@@ -34,8 +36,9 @@ library
                        Paths_disorder_species
                        Disorder.Species.Gen
                        Disorder.Spe.Gen
-                       Disorder.Sp.Combinatorial
+                       Disorder.Sp
                        Disorder.Sp.Gen
+                       Disorder.Sp.Combinatorial
                        Disorder.Sp.ST
 
 test-suite test

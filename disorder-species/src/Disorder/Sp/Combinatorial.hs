@@ -9,7 +9,7 @@ module Disorder.Sp.Combinatorial (
 , fac
 , firstPartitionSet
 , intPartitions
-, isLastPartitionSet
+, kintPartitions
 , nextPartitionSet
 , partitionSetToPartition
 , unfoldr'
@@ -19,6 +19,7 @@ import           Disorder.Sp.ST
 
 import           Control.Applicative
 import           Control.Arrow
+import           Control.Cond
 import           Control.Monad
 import           Control.Monad.Loops
 import           Control.Monad.ST
@@ -26,11 +27,12 @@ import           Control.Monad.ST
 import           Data.STRef
 import           Data.Array.ST
 import           Data.Foldable as F (toList)
+import           Data.Function.Memoize
 import           Data.List as L
 import qualified Data.Map as M hiding (singleton, (!))
 import           Data.Maybe
 
-import           Prelude hiding (pi)
+import           Prelude hiding (pi, read)
 
 intPartitions :: Int -> [[Int]]
 intPartitions n =
@@ -42,11 +44,11 @@ intPartitions n =
        writeArray as 1 n
 
        whileM_ (ap1 (/= 0) kr) $
-         do k   <- readSTRef kr
-            ak1 <- readArray as (k - 1)
-            ak  <- readArray as k
-            xr  <- newSTRef (ak1 + 1)
-            yr  <- newSTRef (ak  - 1)
+         do k_  <- readSTRef kr
+            ak1 <- readArray as (k_ - 1)
+            ak  <- readArray as k_
+            xr  <- newSTRef (ak1 + 1) -- a[k-1] + 1
+            yr  <- newSTRef (ak  - 1) -- a[k] - 1
             kr  -= 1
 
             whileM_ (ap2 (<=) xr yr) $
@@ -60,36 +62,62 @@ intPartitions n =
             result .= (current :)
        val result
 
-firstPartitionSet :: Int -> Int -> [(Int, Int)]
+kintPartitions :: Integer -> Integer -> [[Integer]]
+kintPartitions n k =
+  let start = n - k + 1  : (const 1 <$> [0..(k - 2)])
+  in  unfoldr' step start
+  where step :: [Integer] -> Maybe [Integer]
+        step [] = Nothing
+        step [x1] = Nothing
+
+        step (x1:x2:xs)
+          | x1 > x2 + 1 = Just (x1 - 1 : x2 + 1 : xs)
+          | x1 == x2 = (x1:) <$> step (x2:xs)
+          | x1 == x2 + 1 =
+             let (before, after) = partition (\x2 -> x2 + 1 == x1) (x2:xs)
+             in  case after of
+                   [] -> Nothing
+                   (x3:xs') -> Just $ (x1 - 1) : before ++ [x3 + 1] ++ xs'
+
+firstPartitionSet :: Int -> Int -> ([Int], [Int])
 firstPartitionSet n k =
   let ps0 = replicate (n - k + 1) 0 ++ ((\i -> i - (n - k)) <$> [(n - k + 1) .. (n - 1)])
-  in  zip ps0 ps0
+  in  (ps0, ps0)
 
-nextPartitionSet :: Int -> Int -> [(Int, Int)] -> Maybe [(Int, Int)]
-nextPartitionSet n k pms =
-  if isLastPartitionSet n k pms then Nothing else
-    Just $ F.toList $ runSTArray $
-    do
-      pmsa <- newListArray (0, n - 1) pms :: ST s (STArray s Int (Int,Int))
-      forM_ (reverse [1..(n - 1)]) $ \i ->
-        do
-          (pi, mi)      <- readArray pmsa i
-          (_, miMinus1) <- readArray pmsa (i - 1)
+-- | see the algorithm described by Michael Orlov
+--   http://www.informatik.uni-ulm.de/ni/Lehre/WS03/DMM/Software/partitions.pdf
+nextPartitionSet :: Int -> Int -> ([Int], [Int]) -> Maybe ([Int], [Int])
+nextPartitionSet n k (ps, ms) =
+  runST $
+  -- initialisation
+  do result   <- newSTRef Nothing
+     hasNext  <- newSTRef False
+     ir       <- newSTRef (n - 1)
+     let psr =  newListArray (0, n) ps
+     let msr =  newListArray (0, n) ms
+     psa     <- psr
+     msa     <- msr
 
-          when (pi < k - 1 && pi <= miMinus1) $
+     -- ir goes from n - 1 to 1 unless we found a next element
+     whileM_ (ap2 (\vi vn -> (vi >= 1) && not vn) ir hasNext) $
+       do i   <- readSTRef ir
+          pi  <- readArray psa i
+          mi  <- readArray msa i
+          mi1 <- readArray msa (i - 1)
+          when (pi < k - 1 && pi <= mi1) $
             do
-              let mi' = max mi (pi + 1)
-              writeArray pmsa i (pi + 1, mi')
-              forM_ [(i + 1)..(n - (k - mi'))]     $ \j -> writeArray pmsa j (0, mi')
-              forM_ [(n - (k - mi') + 1)..(n - 1)] $ \j -> writeArray pmsa j (k - (n - j), k - (n - j))
-      return pmsa
+               hasNext =: True
+               let mi' = max mi (pi + 1)
+               writeArray psa i (pi + 1)
+               writeArray msa i mi'
+               forM_ [(i + 1)..(n - (k - mi'))] $ \j -> writeArray psa j 0 >> writeArray msa j mi'
+          ir -= 1
 
-isLastPartitionSet :: Int -> Int -> [(Int, Int)] -> Bool
-isLastPartitionSet n k pms =
-  foldr (\i r ->
-      let (pi, _) = pms !! i
-          (_, miMinus1) = pms !! (i - 1)
-      in  r && (pi >= k - 1 || pi > miMinus1)) True (reverse [1..(n - 1)])
+     whenM (ap1 (== True) hasNext) $
+       do ps1 <- arrayToList' psa (n - 1)
+          ms1 <- arrayToList' msa (n - 1)
+          result =: Just (ps1, ms1)
+     val result
 
 partitionSetToPartition :: [a] -> [Int] -> [[a]]
 partitionSetToPartition us ps =
@@ -105,12 +133,15 @@ ckn k n = product [(n-k+1)..n] `quot` fac k
 
 -- | Second Stirling number
 ckn2 :: Integer  -> Integer -> Integer
-ckn2 0 0 = 1
-ckn2 k n =
-  if k == 0 || n == 0 then 0 else
-  ckn2 (k - 1) (n - 1) + k * ckn2 k (n - 1)
+ckn2 = memoize2 ckn2_
+  where
+    ckn2_ 0 0 = 1
+    ckn2_ k n =
+      if k == 0 || n == 0 then 0 else
+      ckn2 (k - 1) (n - 1) + k * ckn2 k (n - 1)
 
 -- | Bell number
+--
 bell :: Integer -> Integer
 bell n = sum $ (`ckn2` n) <$> [0..n]
 

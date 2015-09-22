@@ -2,6 +2,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE DoAndIfThenElse #-}
 module Disorder.Sp.Gen (
   Sp(..)
 , (.+.)
@@ -145,7 +146,7 @@ kpartitions k = Sp e c i
     e us =
       let n = length us
           pms = firstPartitionSet n (fromInteger k)
-      in  (partitionSetToPartition us . fmap fst) <$> unfoldr' (nextPartitionSet n (fromInteger k)) pms
+      in  (partitionSetToPartition us . fst) <$> unfoldr' (nextPartitionSet n (fromInteger k)) pms
 
     c = ckn2 k
 
@@ -320,5 +321,7 @@ findMulPartitionFromIndex n k bipar c1 c2 us =
           if l > card bipar n then Nothing else
           do (p1, p2) <- fromIndex bipar n l us
              let c = c1 (toInteger $ length p1) * c2 (toInteger $ length p2)
-             if j < c then return ((p1, p2), j)
-             else go (l + 1) (j - c)
+             if j < c then
+               Just ((p1, p2), j)
+             else
+               go (l + 1) (j - c)

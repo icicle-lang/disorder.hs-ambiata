@@ -6,12 +6,14 @@ import           System.IO
 --import qualified Test.Disorder.Species.Gen
 --import qualified Test.Disorder.Spe.Gen
 import qualified Test.Disorder.Sp.Gen
+import qualified Test.Disorder.Sp.Combinatorial
 
 main :: IO ()
 main = disorderMain [
 --    Test.Disorder.Species.Gen.tests
 --   Test.Disorder.Spe.Gen.tests
-   Test.Disorder.Sp.Gen.tests
+    Test.Disorder.Sp.Gen.tests
+  , Test.Disorder.Sp.Combinatorial.tests
   ]
 
 disorderMain :: [IO Bool] -> IO ()

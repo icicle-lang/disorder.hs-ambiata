@@ -12,6 +12,7 @@ import           Disorder.Sp.Gen
 import qualified Data.Text as T
 
 import           Test.QuickCheck
+import           Test.Disorder.Sp.Arbitraries
 
 cardinality (Sp e c _) as =
   label "cardinality" $
@@ -71,29 +72,7 @@ prop_biparC (PositiveSmall l) = species (biparC (toInteger l))
 containsAll :: Eq a => [a] -> [a] -> Bool
 containsAll as = all (`elem` as)
 
-data PositiveSmall =
-  PositiveSmall Int
-  deriving (Eq, Show)
 
-instance Arbitrary PositiveSmall where
-  arbitrary = PositiveSmall <$> choose (1, 5)
-
-----------
--- HELPERS
-----------
-
-simpsons :: [T.Text]
-simpsons =
-  [
-    "homer"
-  , "marge"
-  , "maggie"
-  , "lisa"
-  , "bart"
-  , "flanders"
-  , "moe"
-  , "barney"
-  ]
 --
 
 return []

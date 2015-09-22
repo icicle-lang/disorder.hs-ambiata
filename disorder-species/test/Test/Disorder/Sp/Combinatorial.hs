@@ -10,7 +10,12 @@ import           Control.Applicative
 import           Disorder.Sp.Combinatorial
 
 import           Test.QuickCheck
+import           Test.Disorder.Sp.Arbitraries
 
+prop_kintPartitions (PositiveIntegerSmall n) = forAll (choose (1, n)) $ \k ->
+  conjoin [
+    all (== n) (sum <$> kintPartitions n k)
+  ]
 
 --
 

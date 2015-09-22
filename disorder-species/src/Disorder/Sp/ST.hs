@@ -9,7 +9,9 @@ module Disorder.Sp.ST (
 , (.=)
 , ap1
 , ap2
+, ap2'
 , arrayToList
+, arrayToList'
 , ref
 , read
 , val
@@ -52,6 +54,11 @@ ap2 f a b =
      b' <- readSTRef b
      return $ f a' b'
 
+ap2' :: (a -> b -> c) -> STRef s a -> b -> ST s c
+ap2' f a b =
+  do a' <- readSTRef a
+     return $ f a' b
+
 val :: STRef s a -> ST s a
 val = readSTRef
 
@@ -64,6 +71,11 @@ arrayToList :: (Ix i, Enum i, Num i) => STArray s i a -> STRef s i -> ST s [a]
 arrayToList ar i =
   do
     index <- readSTRef i
+    forM [0..index] (readArray ar)
+
+arrayToList' :: (Ix i, Enum i, Num i) => STArray s i a -> i -> ST s [a]
+arrayToList' ar index =
+  do
     forM [0..index] (readArray ar)
 
 write :: Ix i => ST s (STArray s i e) -> STRef s i -> STRef s e -> ST s ()
