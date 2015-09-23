@@ -55,6 +55,7 @@ kintPartitions n k =
              in  case minusMore of
                    [] -> Nothing
                    (x3:rest) -> Just $ (x1 - 1) : minusOne ++ (x3 + 1 : rest)
+          | otherwise = Nothing
 
 setPartitions :: Integer -> [[[Integer]]]
 setPartitions n = concatMap (ksetPartitions n) [1..n]
