@@ -9,8 +9,6 @@ module Test.Disorder.Sp.Gen where
 import           Control.Applicative
 import           Disorder.Sp.Gen
 
-import qualified Data.Text as T
-
 import           Test.QuickCheck
 import           Test.Disorder.Sp.Arbitraries
 

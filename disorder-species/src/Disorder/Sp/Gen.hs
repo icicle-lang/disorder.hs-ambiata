@@ -32,7 +32,7 @@ module Disorder.Sp.Gen (
 , x
 ) where
 
-import           Disorder.Sp.Combinatorial
+import           Disorder.Sp.Combinatorial as C
 
 import           Control.Applicative
 import           Control.Arrow (first, second)
@@ -144,9 +144,10 @@ kpartitions :: Integer -> Sp a [[a]]
 kpartitions k = Sp e c i
   where
     e us =
-      let n = length us
-          pms = firstPartitionSet n (fromInteger k)
-      in  (partitionSetToPartition us . fst) <$> unfoldr' (nextPartitionSet n (fromInteger k)) pms
+      let ps = ksetPartitions (toInteger . length $ us) k
+      in  mapLabels <$> ps
+      where
+        mapLabels jss = (\js -> (\j -> us !! fromInteger j) <$> js) <$> jss
 
     c = ckn2 k
 

@@ -10,8 +10,10 @@ module Disorder.Sp.Combinatorial (
 , firstPartitionSet
 , intPartitions
 , kintPartitions
+, ksetPartitions
 , nextPartitionSet
 , partitionSetToPartition
+, setPartitions
 , unfoldr'
 ) where
 
@@ -26,7 +28,6 @@ import           Control.Monad.ST
 
 import           Data.STRef
 import           Data.Array.ST
-import           Data.Foldable as F (toList)
 import           Data.Function.Memoize
 import           Data.List as L
 import qualified Data.Map as M hiding (singleton, (!))
@@ -43,8 +44,7 @@ kintPartitions n k =
   in  unfoldr' step start
   where step :: [Integer] -> Maybe [Integer]
         step [] = Nothing
-        step [x1] = Nothing
-
+        step [_] = Nothing
         step (x1:x2:xs)
           | x1 > x2 + 1 = Just (x1 - 1 : x2 + 1 : xs)
           | x1 == x2 = (x1:) <$> step (x2:xs)
@@ -54,15 +54,25 @@ kintPartitions n k =
                    [] -> Nothing
                    (x3:rest) -> Just $ (x1 - 1) : minusOne ++ (x3 + 1 : rest)
 
-firstPartitionSet :: Int -> Int -> ([Int], [Int])
+setPartitions :: Integer -> [[[Integer]]]
+setPartitions n = concatMap (ksetPartitions n) [1..n]
+
+ksetPartitions :: Integer -> Integer -> [[[Integer]]]
+ksetPartitions n k =
+  let  pms = firstPartitionSet n k
+  in  partitionSetToPartition . fst <$> unfoldr' (nextPartitionSet n k) pms
+
+
+firstPartitionSet :: Integer -> Integer -> ([Integer], [Integer])
 firstPartitionSet n k =
-  let ps0 = replicate (n - k + 1) 0 ++ ((\i -> i - (n - k)) <$> [(n - k + 1) .. (n - 1)])
+  let ps0 = replicate (fromInteger $ n - k + 1) 0 ++ ((\i -> i - (n - i)) <$> [(n - k + 1) .. (n - 1)])
   in  (ps0, ps0)
 
 -- | see the algorithm described by Michael Orlov
 --   http://www.informatik.uni-ulm.de/ni/Lehre/WS03/DMM/Software/partitions.pdf
-nextPartitionSet :: Int -> Int -> ([Int], [Int]) -> Maybe ([Int], [Int])
-nextPartitionSet n k (ps, ms) =
+nextPartitionSet :: Integer -> Integer -> ([Integer], [Integer]) -> Maybe ([Integer], [Integer])
+nextPartitionSet ni k (ps, ms) =
+  let n = fromInteger ni in
   runST $
   -- initialisation
   do result   <- newSTRef Nothing
@@ -94,13 +104,13 @@ nextPartitionSet n k (ps, ms) =
           result =: Just (ps1, ms1)
      val result
 
-partitionSetToPartition :: [a] -> [Int] -> [[a]]
-partitionSetToPartition us ps =
-  (\m -> snd <$> M.toList m) $ L.foldr updateSet M.empty (zip ps [(0::Int)..])
+partitionSetToPartition :: [Integer] -> [[Integer]]
+partitionSetToPartition ps =
+  (\m -> snd <$> M.toList m) $ L.foldr updateSet M.empty (zip ps [(0::Integer)..])
   where
     updateSet (pj, j) m =
       let s = M.findWithDefault [] pj m
-      in  M.insert pj ((us !! j):s) m
+      in  M.insert pj (j:s) m
 
 -- | Binomial number
 ckn :: Integer  -> Integer -> Integer
