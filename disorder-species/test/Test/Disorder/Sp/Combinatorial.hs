@@ -16,6 +16,7 @@ prop_kintPartitions (PositiveIntegerSmall n) = forAll (choose (1, n)) $ \k ->
   conjoin [
     all ((== n) . sum) kints
   , all ((== fromInteger k) . length) kints
+  , fromInteger (kintPartitionsCard n k) == length kints
   ]
 
 --

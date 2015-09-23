@@ -7,12 +7,14 @@ module Disorder.Sp.Combinatorial (
 , ckn
 , ckn2
 , fac
-, firstPartitionSet
 , intPartitions
 , kintPartitions
 , ksetPartitions
-, nextPartitionSet
-, partitionSetToPartition
+, kintPartitionsCard
+, intPartitionsCard
+, firstPartitionWord
+, nextPartitionWord
+, partitionWordToPartition
 , setPartitions
 , unfoldr'
 ) where
@@ -59,19 +61,72 @@ setPartitions n = concatMap (ksetPartitions n) [1..n]
 
 ksetPartitions :: Integer -> Integer -> [[[Integer]]]
 ksetPartitions n k =
-  let  pms = firstPartitionSet n k
-  in  partitionSetToPartition . fst <$> unfoldr' (nextPartitionSet n k) pms
+  let  pms = firstPartitionWord n k
+  in  partitionWordToPartition . fst <$> unfoldr' (nextPartitionWord n k) pms
 
+-- for a given partition return all the possible combinations
+-- of partition words
+-- for example for 3 1 1 return
+-- group by size
+-- a * 3 + b * 2 + c * 1
+-- c k a <*> c (n - k) b <*> c (n - k) c
+-- 0 1 2
+-- 0 2 1
+-- 1 2 0
+-- 000 1 2
+-- 0 111 2
+-- 0 1 222
 
-firstPartitionSet :: Integer -> Integer -> ([Integer], [Integer])
-firstPartitionSet n k =
+-- 3 1 1 - 3 1 = 0 0 1
+-- [0,0,0,1,2]
+--
+-- [0,0,1,0,2]
+-- [0,0,1,2,0]
+--
+-- [0,1,0,0,2]
+-- [0,1,0,2,0]
+--
+-- [0,1,2,0,0]
+--
+-- [0,1,1,1,2]
+-- [0,1,1,2,1]
+-- [0,1,2,1,1]
+--
+-- [0,1,2,2,2]
+{-kintPartitionToWords :: [Integer] -> [[Integer]]
+kintPartitionToWords partition =
+  let k = length partition in
+  go 0 partition []
+  where
+    go i [] r = r
+    go i [a] r =
+
+-}
+
+intPartitionsCard :: Integer -> Integer
+intPartitionsCard n = sum (kintPartitionsCard n <$> [1..n])
+
+kintPartitionsCard :: Integer -> Integer -> Integer
+kintPartitionsCard =
+  memoize2 kintPartitionsCard_
+  where
+    kintPartitionsCard_ n k
+      | n < 0 || k < 0 = 0
+      | k == 1 = 1
+      | k > n = 0
+      | otherwise = kintPartitionsCard (n - 1) (k - 1) + kintPartitionsCard (n - k) k
+
+firstPartitionWord :: Integer -> Integer -> ([Integer], [Integer])
+firstPartitionWord n k =
+  -- first n - k elements in the first set
+  -- then all other k elements in a distinct set
   let ps0 = replicate (fromInteger $ n - k + 1) 0 ++ ((\i -> i - (n - i)) <$> [(n - k + 1) .. (n - 1)])
   in  (ps0, ps0)
 
 -- | see the algorithm described by Michael Orlov
 --   http://www.informatik.uni-ulm.de/ni/Lehre/WS03/DMM/Software/partitions.pdf
-nextPartitionSet :: Integer -> Integer -> ([Integer], [Integer]) -> Maybe ([Integer], [Integer])
-nextPartitionSet ni k (ps, ms) =
+nextPartitionWord :: Integer -> Integer -> ([Integer], [Integer]) -> Maybe ([Integer], [Integer])
+nextPartitionWord ni k (ps, ms) =
   let n = fromInteger ni in
   runST $
   -- initialisation
@@ -104,8 +159,8 @@ nextPartitionSet ni k (ps, ms) =
           result =: Just (ps1, ms1)
      val result
 
-partitionSetToPartition :: [Integer] -> [[Integer]]
-partitionSetToPartition ps =
+partitionWordToPartition :: [Integer] -> [[Integer]]
+partitionWordToPartition ps =
   (\m -> snd <$> M.toList m) $ L.foldr updateSet M.empty (zip ps [(0::Integer)..])
   where
     updateSet (pj, j) m =
