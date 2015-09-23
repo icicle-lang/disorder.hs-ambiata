@@ -9,6 +9,7 @@ module Disorder.Sp.Combinatorial (
 , fac
 , intPartitions
 , kintPartitions
+, kintPartitionToWords
 , ksetPartitions
 , kintPartitionsCard
 , intPartitionsCard
@@ -16,7 +17,14 @@ module Disorder.Sp.Combinatorial (
 , nextPartitionWord
 , partitionWordToPartition
 , setPartitions
+, subIntPartition
+, wordSizes
+, nextWord
+, stepWord
+, wordIsFinished
+, wordCantBeFinished
 , unfoldr'
+, unfoldList
 ) where
 
 import           Disorder.Sp.ST
@@ -80,8 +88,10 @@ ksetPartitions n k =
 
 -- 3 1 1 - 3 1 = 0 0 1
 -- [0,0,0,1,2]
---
+-- 3 1 1 - 2 1 = 1 0 1
 -- [0,0,1,0,2]
+
+-- 3 1 1 - 2 1 1 = 1 0 0
 -- [0,0,1,2,0]
 --
 -- [0,1,0,0,2]
@@ -94,15 +104,71 @@ ksetPartitions n k =
 -- [0,1,2,1,1]
 --
 -- [0,1,2,2,2]
-{-kintPartitionToWords :: [Integer] -> [[Integer]]
-kintPartitionToWords partition =
-  let k = length partition in
-  go 0 partition []
-  where
-    go i [] r = r
-    go i [a] r =
 
--}
+type IntegerPartition = [Integer]
+type Word = [Integer]
+type Letter = Integer
+
+kintPartitionToWords :: [Integer] -> [[Integer]]
+kintPartitionToWords ip =
+    unfoldList (stepWord n k) ip []
+    where
+      n = sum ip
+      k = toInteger (length ip)
+
+stepWord :: Integer -> Integer -> IntegerPartition -> Word -> Either [Word] (Maybe Word)
+-- no more ints in the partition
+-- the result is valid if it has n elements
+stepWord n _ [] as
+  | length as == fromInteger n = Right (Just as)
+  | otherwise                  = Right Nothing
+
+stepWord _ _ _ [] = Left [[0]]
+
+stepWord n k is as
+  | wordIsFinished is as = Right (Just as)
+  | wordCantBeFinished is as = Right Nothing
+  | otherwise =
+          -- get the maximum index value in the existing word
+      let m = maximum as
+          -- the candidates are all the possible indices which are not too big
+          candidates = filter (<= m + 1) [0..(k-1)]
+      in  Left $ catMaybes $ nextWord is as <$> candidates
+
+-- the next letter can only be chosen if there
+-- are enough "slots" left in the int partition
+nextWord :: IntegerPartition -> Word -> Letter -> Maybe Word
+nextWord ip w letter =
+  let next = w ++ [letter]
+      minus = subIntPartition ip next
+  in  const next <$> minus
+
+wordIsFinished :: IntegerPartition -> Word -> Bool
+wordIsFinished ip w =
+  length w == fromInteger (sum ip) &&
+  fromMaybe False (all (== 0) <$> subIntPartition ip w)
+
+wordCantBeFinished :: IntegerPartition -> Word -> Bool
+wordCantBeFinished ip w =
+  length w == fromInteger (sum ip) &&
+  fromMaybe False (any (> 0) <$> subIntPartition ip w)
+
+subIntPartition :: IntegerPartition -> Word -> Maybe IntegerPartition
+subIntPartition ip w =
+  let ws = wordSizes w                  -- pad the sizes with zeros
+      s = uncurry (-) <$> zip ip (ws ++ replicate (length ip - length w) 0)
+  in if all (>= 0) s then Just s else Nothing
+
+wordSizes :: Word -> IntegerPartition
+wordSizes w =
+  sortBy (flip compare) ((toInteger . length) <$> group (sort w))
+
+unfoldList :: (b -> a -> Either [a] (Maybe a)) -> b -> a -> [a]
+unfoldList f b a =
+  case f b a of
+    Left others -> concatMap (unfoldList f b) others
+    Right (Just found) -> [found]
+    Right Nothing -> []
 
 intPartitionsCard :: Integer -> Integer
 intPartitionsCard n = sum (kintPartitionsCard n <$> [1..n])
