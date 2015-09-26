@@ -132,7 +132,7 @@ partitions = Sp e c i
       let s = toInteger . length $ us
       in  concatMap (\n -> enum (kpartitions n) us) [1..s]
 
-    c n = sum $ (`ckn2` n) <$> [0..n]
+    c n = sum $ cnk2 n <$> [0..n]
 
     i n k us =
       do
@@ -149,7 +149,7 @@ kpartitions k = Sp e c i
       where
         mapLabels jss = (\js -> (\j -> us !! fromInteger j) <$> js) <$> jss
 
-    c = ckn2 k
+    c n = cnk2 n k
 
     i _ _ _ = Nothing
 
@@ -175,7 +175,7 @@ biparC l = Sp e c i
       (first (u:)  <$> enum (biparC (l - 1)) ut) ++
       (second (u:) <$> enum (biparC l) ut)
 
-    c = ckn (toInteger l)
+    c n = cnk n (toInteger l)
 
     i n k us
       | l > n = Nothing
@@ -185,13 +185,13 @@ biparC l = Sp e c i
       | l == 0 = Just ([], take (fromInteger n) us)
       | otherwise =
          let labels = take (fromInteger n) us
-         in  if k < ckn (l - 1) (n - 1) then
+         in  if k < cnk (n - 1) (l - 1) then
                do
                  (vs, zs) <- fromIndex (biparC (l - 1)) (n - 1) k (drop 1 labels)
                  return (head labels : vs, zs)
              else
                do
-                 (vs, zs) <- fromIndex (biparC l) (n - 1) (k - ckn (l - 1 ) (n - 1)) (drop 1 labels)
+                 (vs, zs) <- fromIndex (biparC l) (n - 1) (k - cnk (n - 1) (l - 1 )) (drop 1 labels)
                  return (vs, head labels : zs)
 
 biparL :: BiPar a

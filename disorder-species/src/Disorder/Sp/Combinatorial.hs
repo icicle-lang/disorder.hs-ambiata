@@ -4,8 +4,8 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module Disorder.Sp.Combinatorial (
   bell
-, ckn
-, ckn2
+, cnk
+, cnk2
 , fac
 , intPartitions
 , kintPartitions
@@ -235,22 +235,22 @@ partitionWordToPartition ps =
       in  M.insert pj (j:s) m
 
 -- | Binomial number
-ckn :: Integer  -> Integer -> Integer
-ckn k n = product [(n-k+1)..n] `quot` fac k
+cnk :: Integer  -> Integer -> Integer
+cnk n k = product [(n-k+1)..n] `quot` fac k
 
 -- | Second Stirling number
-ckn2 :: Integer  -> Integer -> Integer
-ckn2 = memoize2 ckn2_
+cnk2 :: Integer  -> Integer -> Integer
+cnk2 = memoize2 cnk2_
   where
-    ckn2_ 0 0 = 1
-    ckn2_ k n =
+    cnk2_ 0 0 = 1
+    cnk2_ n k =
       if k == 0 || n == 0 then 0 else
-      ckn2 (k - 1) (n - 1) + k * ckn2 k (n - 1)
+      cnk2 (n - 1) (k - 1) + k * cnk2 (n - 1) k
 
 -- | Bell number
 --
 bell :: Integer -> Integer
-bell n = sum $ (`ckn2` n) <$> [0..n]
+bell n = sum $ cnk2 n <$> [0..n]
 
 -- | factorial
 fac :: Integer -> Integer
