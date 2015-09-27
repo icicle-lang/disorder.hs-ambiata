@@ -236,14 +236,13 @@ set = Sp e c i
 
 bool :: Sp a Bool
 bool = Sp e c i
-  where e []  = [True]
-        e [_] = [False]
+  where e []  = [True, False]
         e _   = []
 
-        c n = if n <= 1 then 1 else 0
+        c n = if n == 0 then 1 else 0
 
-        i 1 0 _ = Just True
-        i 1 1 _ = Just False
+        i 0 0 _ = Just True
+        i 0 1 _ = Just False
         i _ _ _ = Nothing
 
 one :: Sp a [b]
