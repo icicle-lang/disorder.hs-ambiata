@@ -11,6 +11,9 @@ import           Disorder.Sp.Combinatorial
 import           Test.QuickCheck
 import           Test.Disorder.Sp.Arbitraries
 
+prop_intPartitions (PositiveIntegerSmall n) =
+  all ((== n) . sum) (intPartitions n)
+
 prop_kintPartitions (PositiveIntegerSmall n) = forAll (choose (1, n)) $ \k ->
   let kints = kintPartitions n k in
   conjoin [

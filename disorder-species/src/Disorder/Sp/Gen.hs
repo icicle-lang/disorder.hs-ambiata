@@ -102,12 +102,15 @@ mul bipar@(Sp bpe bpc _) sp1 sp2 = Sp e c i
               z1 = fromIndex sp2 lz p zs
            in  (,) <$> v1 <*> z1
 
+-- | Composition of Species
+--   the labels are distributed from the set partitions of labels
 o :: Sp [a] b -> Sp a c -> Sp a (b, [c])
 o sp1 sp2 = Sp e c i
   where
     e us = enum partitions us >>= enum sp1 >.< mapM (enum sp2)
 
-    c _ = 0
+    -- the number of set partitions are bell numbers
+    c = bell
     i _ _ _ = Nothing
 
 -- | The Cartesian product of two species.
@@ -127,31 +130,34 @@ fenum (Sp _ c i) as =
 partitions :: Sp a [[a]]
 partitions = Sp e c i
   where
-    e [] = []
-    e us =
-      let s = toInteger . length $ us
-      in  concatMap (\n -> enum (kpartitions n) us) [1..s]
-
-    c n = sum $ cnk2 n <$> [0..n]
+    e us = mapLabelsOnSetPartition us (setPartitions (toInteger . length $ us))
+    c = bell
 
     i n k us =
       do
         (l, j) <- findLevelIndex n k (\r -> card (kpartitions r) n)
         fromIndex (kpartitions l) n j us
 
--- | The species of set partitions having exactly p partitions
+-- | The species of set partitions having exactly k partitions
 kpartitions :: Integer -> Sp a [[a]]
 kpartitions k = Sp e c i
   where
     e us =
       let ps = ksetPartitions (toInteger . length $ us) k
-      in  mapLabels <$> ps
-      where
-        mapLabels jss = (\js -> (\j -> us !! fromInteger j) <$> js) <$> jss
+      in  mapLabelsOnSetPartition us ps
 
     c n = cnk2 n k
 
+    -- find the int partition giving rise to the set partition at index k
+    -- then do a binary search of the set partition
     i _ _ _ = Nothing
+      --do (l, j) <- findLevelIndex n k (\r -> kintPartitionsCard k n)
+      --   fromIndex (kintPartitions !! l) n j us
+
+
+mapLabelsOnSetPartition :: [a] -> [[[Integer]]] -> [[[a]]]
+mapLabelsOnSetPartition us sp =
+  (\iss -> (\is -> (\i -> us !! fromInteger i) <$> is) <$> iss) <$> sp
 
 biparB :: BiPar a
 biparB = Sp e c i

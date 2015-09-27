@@ -9,35 +9,17 @@ module Disorder.Sp.Combinatorial (
 , fac
 , intPartitions
 , kintPartitions
-, kintPartitionToWords
 , ksetPartitions
 , kintPartitionsCard
 , intPartitionsCard
-, firstPartitionWord
-, nextPartitionWord
-, partitionWordToPartition
 , setPartitions
-, subIntPartition
-, wordSizes
-, nextWord
-, stepWord
-, wordIsFinished
-, wordCantBeFinished
-, unfoldr'
-, unfoldList
+, unfoldr1
+, unfoldMany
 ) where
-
-import           Disorder.Sp.ST
 
 import           Control.Applicative
 import           Control.Arrow
-import           Control.Cond
-import           Control.Monad
-import           Control.Monad.Loops
-import           Control.Monad.ST
 
-import           Data.STRef
-import           Data.Array.ST
 import           Data.Function.Memoize
 import           Data.List as L
 import qualified Data.Map as M hiding (singleton, (!))
@@ -45,77 +27,77 @@ import           Data.Maybe
 
 import           Prelude hiding (pi, read)
 
+-- | enumerate the integer partitions of a number n
+--   in order of partition size (number of summands of n)
 intPartitions :: Integer -> [[Integer]]
 intPartitions n = concatMap (kintPartitions n) [1..n]
 
+-- | enumerate the number of way to decompose a number n
+--   in order k parts
 kintPartitions :: Integer -> Integer -> [[Integer]]
-kintPartitions n k =
-  let start = n - k + 1  : (const 1 <$> [0..(k - 2)])
-  in  unfoldr' step start
-  where step :: [Integer] -> Maybe [Integer]
-        step [] = Nothing
-        step [_] = Nothing
-        step (x1:x2:xs)
-          | x1 > x2 + 1 = Just (x1 - 1 : x2 + 1 : xs)
-          | x1 == x2 = (x1:) <$> step (x2:xs)
-          | x1 == x2 + 1 =
-             let (minusOne, minusMore) = partition (\x -> x + 1 == x1) (x2:xs)
-             in  case minusMore of
-                   [] -> Nothing
-                   (x3:rest) -> Just $ (x1 - 1) : minusOne ++ (x3 + 1 : rest)
-          | otherwise = Nothing
+kintPartitions = memoize2 kintPartitions_
+  where
+    kintPartitions_ :: Integer -> Integer -> [[Integer]]
+    kintPartitions_ n k
+      | n < 0 || k < 0 = []
+      | k > n = []
+      | k == 1 = [[n]]
+      | otherwise =
+          ((1:) <$> kintPartitions (n - 1) (k - 1)) ++
+          (map (+1) <$> kintPartitions (n - k) k)
 
+-- | enumerate all the set partitions of a set of a given size n
+--   ordered by partitions size (number of subsets in the partition)
 setPartitions :: Integer -> [[[Integer]]]
 setPartitions n = concatMap (ksetPartitions n) [1..n]
 
+-- | enumerate all the set partitions of a set of a given size n
+--   with k subsets.
+--
+--   Actually "words" are being enumerated rather than set partitions
+--   A "word" is an array representation of a set partition where
+--   the "letter" j at position i indicates that element i belongs
+--   to the subset j.
+--   Subsets are being ordered by the elements having the lowest index
+--   For example: [[1,3,5][2,4][6,7]] is set partition of [1..7]
+--   it is represented by the word [0,1,0,1,0,2,2]
+--   One characteristic of this "word" representation is that
+--   for i >= 2  k[i] <= max k[j] + 1 for j < i
+--   Informally this means that the value at the "next index" can not be
+--   "too big" compared to previous values. This is why this is called
+--   a condition of "restricted growth"
+--
+--   To enumerate set partitions of size k we need to
+--     - enumerate the int partitions of size k
+--     - for each int partition, find all the words
+--       having the same number of elements than the summands in the int
+--       partition
 ksetPartitions :: Integer -> Integer -> [[[Integer]]]
 ksetPartitions n k =
-  let  pms = firstPartitionWord n k
-  in  partitionWordToPartition . fst <$> unfoldr' (nextPartitionWord n k) pms
+  let ints = kintPartitions n k
+  in  wordToPartition <$> concatMap kintPartitionToWords ints
 
--- for a given partition return all the possible combinations
--- of partition words
--- for example for 3 1 1 return
--- group by size
--- a * 3 + b * 2 + c * 1
--- c k a <*> c (n - k) b <*> c (n - k) c
--- 0 1 2
--- 0 2 1
--- 1 2 0
--- 000 1 2
--- 0 111 2
--- 0 1 222
-
--- 3 1 1 - 3 1 = 0 0 1
--- [0,0,0,1,2]
--- 3 1 1 - 2 1 = 1 0 1
--- [0,0,1,0,2]
-
--- 3 1 1 - 2 1 1 = 1 0 0
--- [0,0,1,2,0]
---
--- [0,1,0,0,2]
--- [0,1,0,2,0]
---
--- [0,1,2,0,0]
---
--- [0,1,1,1,2]
--- [0,1,1,2,1]
--- [0,1,2,1,1]
---
--- [0,1,2,2,2]
-
+-- | type alias to help with helper functions
 type IntegerPartition = [Integer]
+type SetPartition = [[Integer]]
 type Word = [Integer]
 type Letter = Integer
 
-kintPartitionToWords :: [Integer] -> [[Integer]]
+-- | for a given int partition of size k
+--   enumerate all the words representing k sets
+--   so that the number of elements in each set
+--   corresponds to the summands of the int partition
+kintPartitionToWords :: IntegerPartition -> [Word]
 kintPartitionToWords ip =
-    unfoldList (stepWord n k) ip []
+    unfoldMany (stepWord n k ip) []
     where
       n = sum ip
       k = toInteger (length ip)
 
+-- | for a given integer partition and current word prefix
+--   find the possible extensions for that word which are compatible with
+--   the int partition. If no more extensions can be found return either
+--   a word that corresponds to that partition or nothing
 stepWord :: Integer -> Integer -> IntegerPartition -> Word -> Either [Word] (Maybe Word)
 -- no more ints in the partition
 -- the result is valid if it has n elements
@@ -125,7 +107,11 @@ stepWord n _ [] as
 
 stepWord _ _ _ [] = Left [[0]]
 
-stepWord n k is as
+-- if the current word is finished return it
+-- if it can not be finished given the current int partition, return nothing
+-- otherwise, find out the possible letters extending that word (see the restricted growth property)
+-- and return those words
+stepWord _ k is as
   | wordIsFinished is as = Right (Just as)
   | wordCantBeFinished is as = Right Nothing
   | otherwise =
@@ -135,44 +121,51 @@ stepWord n k is as
           candidates = filter (<= m + 1) [0..(k-1)]
       in  Left $ catMaybes $ nextWord is as <$> candidates
 
--- the next letter can only be chosen if there
--- are enough "slots" left in the int partition
+-- | try to extend the word with another letter
+--   this is only possible if there are enough
+--   "slots" left in the int partition.
 nextWord :: IntegerPartition -> Word -> Letter -> Maybe Word
 nextWord ip w letter =
   let next = w ++ [letter]
       minus = subIntPartition ip next
   in  const next <$> minus
 
+-- | A word is finished if the set partition it represents
+--   has as many elements as the int partition and if each set
+--   size corresponds to a summand in the int partition
 wordIsFinished :: IntegerPartition -> Word -> Bool
 wordIsFinished ip w =
   length w == fromInteger (sum ip) &&
   fromMaybe False (all (== 0) <$> subIntPartition ip w)
 
+-- | A word is finished if the set partition it represents
+--   has as many elements as the int partition but if some set
+--   size does not correspond to a summand in the int partition
 wordCantBeFinished :: IntegerPartition -> Word -> Bool
 wordCantBeFinished ip w =
   length w == fromInteger (sum ip) &&
   fromMaybe False (any (> 0) <$> subIntPartition ip w)
 
+-- | for a given int partition and word subtract the word sizes
+--   from the int partition number and return the remaining letters which can
+--   be used to extend the word.
 subIntPartition :: IntegerPartition -> Word -> Maybe IntegerPartition
 subIntPartition ip w =
   let ws = wordSizes w                  -- pad the sizes with zeros
       s = uncurry (-) <$> zip ip (ws ++ replicate (length ip - length w) 0)
   in if all (>= 0) s then Just s else Nothing
 
+-- | compute the number of times that each letter of the word is represented
 wordSizes :: Word -> IntegerPartition
 wordSizes w =
   sortBy (flip compare) ((toInteger . length) <$> group (sort w))
 
-unfoldList :: (b -> a -> Either [a] (Maybe a)) -> b -> a -> [a]
-unfoldList f b a =
-  case f b a of
-    Left others -> concatMap (unfoldList f b) others
-    Right (Just found) -> [found]
-    Right Nothing -> []
-
+-- | return the number of int partitions of n
 intPartitionsCard :: Integer -> Integer
 intPartitionsCard n = sum (kintPartitionsCard n <$> [1..n])
 
+-- | return the number of int partitions of n
+--   having k summards
 kintPartitionsCard :: Integer -> Integer -> Integer
 kintPartitionsCard =
   memoize2 kintPartitionsCard_
@@ -183,51 +176,9 @@ kintPartitionsCard =
       | k > n = 0
       | otherwise = kintPartitionsCard (n - 1) (k - 1) + kintPartitionsCard (n - k) k
 
-firstPartitionWord :: Integer -> Integer -> ([Integer], [Integer])
-firstPartitionWord n k =
-  -- first n - k elements in the first set
-  -- then all other k elements in a distinct set
-  let ps0 = replicate (fromInteger $ n - k + 1) 0 ++ ((\i -> i - (n - i)) <$> [(n - k + 1) .. (n - 1)])
-  in  (ps0, ps0)
-
--- | see the algorithm described by Michael Orlov
---   http://www.informatik.uni-ulm.de/ni/Lehre/WS03/DMM/Software/partitions.pdf
-nextPartitionWord :: Integer -> Integer -> ([Integer], [Integer]) -> Maybe ([Integer], [Integer])
-nextPartitionWord ni k (ps, ms) =
-  let n = fromInteger ni in
-  runST $
-  -- initialisation
-  do result   <- newSTRef Nothing
-     hasNext  <- newSTRef False
-     ir       <- newSTRef (n - 1)
-     let psr =  newListArray (0, n) ps
-     let msr =  newListArray (0, n) ms
-     psa     <- psr
-     msa     <- msr
-
-     -- ir goes from n - 1 to 1 unless we found a next element
-     whileM_ (ap2 (\vi vn -> (vi >= 1) && not vn) ir hasNext) $
-       do i   <- readSTRef ir
-          pi  <- readArray psa i
-          mi  <- readArray msa i
-          mi1 <- readArray msa (i - 1)
-          when (pi < k - 1 && pi <= mi1) $
-            do
-               hasNext =: True
-               let mi' = max mi (pi + 1)
-               writeArray psa i (pi + 1)
-               writeArray msa i mi'
-               forM_ [(i + 1)..(n - (k - mi'))] $ \j -> writeArray psa j 0 >> writeArray msa j mi'
-          ir -= 1
-
-     whenM (ap1 (== True) hasNext) $
-       do ps1 <- arrayToList' psa (n - 1)
-          ms1 <- arrayToList' msa (n - 1)
-          result =: Just (ps1, ms1)
-     val result
-
-partitionWordToPartition :: [Integer] -> [[Integer]]
-partitionWordToPartition ps =
+-- |
+wordToPartition :: Word -> SetPartition
+wordToPartition ps =
   (\m -> snd <$> M.toList m) $ L.foldr updateSet M.empty (zip ps [(0::Integer)..])
   where
     updateSet (pj, j) m =
@@ -256,6 +207,19 @@ bell n = sum $ cnk2 n <$> [0..n]
 fac :: Integer -> Integer
 fac n = if n <= 1 then 1 else n * fac (n - 1)
 
+-- | unfold search function
+--   from a the current element
+--   compute either:
+--     - a list of possible next candidates
+--     - or the final solution
+--     - or nothing if the current element was a dead end
+unfoldMany :: (a -> Either [a] (Maybe a)) -> a -> [a]
+unfoldMany f a =
+  case f a of
+    Left others -> concatMap (unfoldMany f) others
+    Right (Just found) -> [found]
+    Right Nothing -> []
+
 -- | specialisation of unfoldr where the return value is the same as the seed
-unfoldr' :: (a -> Maybe a) -> a -> [a]
-unfoldr' f a = a : unfoldr (\y -> (id &&& id) <$> f y) a
+unfoldr1 :: (a -> Maybe a) -> a -> [a]
+unfoldr1 f a = a : unfoldr (\y -> (id &&& id) <$> f y) a
