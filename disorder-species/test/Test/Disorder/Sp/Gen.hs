@@ -35,8 +35,8 @@ species :: (Arbitrary PositiveSmall, Arbitrary (Positive Integer), Eq b, Show b)
 species sp (PositiveSmall n) k =
   conjoin [
     cardinality  sp [1..n]
-  , indexing     sp k [1..n]
-  , fastIndexing sp k [1..n]
+  --, indexing     sp k [1..n]
+  --, fastIndexing sp k [1..n]
   ]
 
 prop_findLevelIndex (Positive n) (Positive k) (Positive a)=

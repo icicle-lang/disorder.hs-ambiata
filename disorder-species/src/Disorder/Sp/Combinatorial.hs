@@ -11,6 +11,8 @@ module Disorder.Sp.Combinatorial (
 , kintPartitions
 , ksetPartitions
 , kintPartitionsCard
+, kintPartitionToWords
+, wordToPartition
 , intPartitionsCard
 , setPartitions
 , unfoldr1
@@ -78,8 +80,10 @@ ksetPartitions n k =
   in  wordToPartition <$> concatMap kintPartitionToWords ints
 
 -- | type alias to help with helper functions
+-- integer partition assumes that the numbers are sorted
 type IntegerPartition = [Integer]
 type SetPartition = [[Integer]]
+-- Word assumes that the numbers are sorted
 type Word = [Integer]
 type Letter = Integer
 
@@ -152,7 +156,7 @@ wordCantBeFinished ip w =
 subIntPartition :: IntegerPartition -> Word -> Maybe IntegerPartition
 subIntPartition ip w =
   let ws = wordSizes w                  -- pad the sizes with zeros
-      s = uncurry (-) <$> zip ip (ws ++ replicate (length ip - length w) 0)
+      s = uncurry (-) <$> zip (reverse ip) (ws ++ replicate (length ip - length w) 0)
   in if all (>= 0) s then Just s else Nothing
 
 -- | compute the number of times that each letter of the word is represented
