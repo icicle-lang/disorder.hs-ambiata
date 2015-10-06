@@ -1,0 +1,31 @@
+name:                  ambiata-disorder-cli
+version:               0.0.1
+license:               AllRightsReserved
+author:                Ambiata <info@ambiata.com>
+maintainer:            Ambiata <info@ambiata.com>
+copyright:             (c) 2015 Ambiata
+synopsis:              disorder-cli
+category:              System
+cabal-version:         >= 1.8
+build-type:            Simple
+description:           disorder-cli.
+
+library
+  build-depends:
+                       base                            >= 3          && < 5
+                     , directory                       == 1.2.*
+                     , ieee754                         == 0.7.*
+                     , process                         == 1.2.*
+                     , text                            >= 1.1        && < 1.3
+                     , turtle                          == 1.2.*
+
+  ghc-options:
+                       -Wall
+
+  hs-source-dirs:
+                       src
+
+
+  exposed-modules:
+                       Paths_ambiata_disorder_cli
+                       Disorder.Cli.Shell
