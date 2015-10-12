@@ -7,18 +7,18 @@ git submodule sync
 git submodule init
 git submodule update
 
-./framework/cabal update
+./framework/mafia update
 
 # test everything
 
 MODULES=$(ls disorder-*/*.cabal)
 
 for x in $MODULES; do
-  (cd $(dirname $x) && ./cabal test) || exit $?
+  (cd $(dirname $x) && ./mafia testci) || exit $?
 done
 
 # build everything
 
 for x in $MODULES; do
- (cd $(dirname $x) && ./cabal build) || exit $?
+ (cd $(dirname $x) && ./mafia build) || exit $?
 done
