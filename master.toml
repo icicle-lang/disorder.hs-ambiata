@@ -1,0 +1,8 @@
+[master]
+  runner = "s3://ambiata-dist/master-ambiata/master-haskell-multi-library-0.0.1-20151022072201-6e35303"
+  version = 1
+
+[build.dist]
+  HADDOCK = "true"
+
+[build.branches]
