@@ -1,9 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Test.Disorder.Core.Property where
 
-import           Control.Applicative       ((<$>))
 import           Data.AEq                  (AEq)
 import qualified Data.AEq                  as AEQ
+import           Data.Functor
 import           Data.List                 (delete)
 import           Data.Text                 (Text)
 
@@ -13,6 +13,8 @@ import           Numeric.IEEE
 
 import           Test.QuickCheck
 import           Test.QuickCheck.Instances ()
+
+import           Prelude
 
 prop_failWith :: Text -> Property
 prop_failWith t =
@@ -53,13 +55,13 @@ prop_negXor x y =
 
 prop_areEquivalent :: (Eq a, Show a) => [a] -> Property
 prop_areEquivalent ls =
-  forAll (shuffle ls) $ \rs ->
+  forAll (shuf ls) $ \rs ->
     ls =\\= rs
   where
-    shuffle [] = return []
-    shuffle xs = do
+    shuf [] = return []
+    shuf xs = do
       x <- elements xs
-      (x:) <$> shuffle (delete x xs)
+      (x:) <$> shuf (delete x xs)
 
 prop_areNotEquivalent :: (Eq a, Show a) => [a] -> [a] -> Property
 prop_areNotEquivalent ls rs =

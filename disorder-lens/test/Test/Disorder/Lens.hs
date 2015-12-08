@@ -4,9 +4,11 @@ module Test.Disorder.Lens where
 import           Disorder.Lens
 
 import           Control.Lens ( _Just, Prism'  )
-import           Data.Traversable ( traverse )
+import           Data.Traversable
 
 import           Test.QuickCheck
+
+import           Prelude
 
 prop_prismSymmetry :: (Arbitrary a, Show a, Eq a) => a -> Property
 prop_prismSymmetry = prismSymmetry _Just
