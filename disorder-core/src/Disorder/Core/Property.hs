@@ -3,9 +3,9 @@ module Disorder.Core.Property (
   , (~~~)
   , (.^.)
   , (<=>)
+  , (=\\=)
   , failWith
   , neg
-  , areEquivalent
   ) where
 
 import           Data.AEq                 (AEq)
@@ -75,8 +75,15 @@ infixr 1 <=>
 (<=>) :: (Testable p1, Testable p2) => p1 -> p2 -> Property
 a <=> b = (a .&&. b) .||. (neg a .&&. neg b)
 
-areEquivalent :: (Eq a, Show a) => [a] -> [a] -> Property
-areEquivalent ls rs =
+infix 4 =\\=
+-- |
+-- Test equivalence of the lists
+-- i.e. if 'ls' and 'rs' contain the same elements, possible in a different order
+(=\\=) :: (Eq a, Show a) => [a] -> [a] -> Property
+ls =\\= rs =
   let els = ls \\ rs
       ers = rs \\ ls
-  in counterexample ("Lists are not equivalent; extra elements: " ++ show (els,ers)) $ els ++ ers == []
+  in flip counterexample (els ++ ers == []) $
+    "Lists are not equivalent: " ++
+    "(ls \\\\ rs) == " ++ show els ++ " && " ++
+    "(rs \\\\ ls) == " ++ show ers
