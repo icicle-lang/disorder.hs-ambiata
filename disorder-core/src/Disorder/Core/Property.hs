@@ -1,7 +1,16 @@
-module Disorder.Core.Property where
+module Disorder.Core.Property (
+    (=/=)
+  , (~~~)
+  , (.^.)
+  , (<=>)
+  , (=\\=)
+  , failWith
+  , neg
+  ) where
 
 import           Data.AEq                 (AEq)
 import qualified Data.AEq                 as AEQ
+import           Data.List                ((\\))
 import           Data.Text                (Text, unpack)
 
 import           Test.QuickCheck.Gen
@@ -65,3 +74,16 @@ p1 .^. p2 = (p1 .||. p2) .&&. neg (p1 .&&. p2)
 infixr 1 <=>
 (<=>) :: (Testable p1, Testable p2) => p1 -> p2 -> Property
 a <=> b = (a .&&. b) .||. (neg a .&&. neg b)
+
+infix 4 =\\=
+-- |
+-- Test equivalence of the lists
+-- i.e. if 'ls' and 'rs' contain the same elements, possible in a different order
+(=\\=) :: (Eq a, Show a) => [a] -> [a] -> Property
+ls =\\= rs =
+  let els = ls \\ rs
+      ers = rs \\ ls
+  in flip counterexample (els ++ ers == []) $
+    "Lists are not equivalent: " ++
+    "(ls \\\\ rs) == " ++ show els ++ " && " ++
+    "(rs \\\\ ls) == " ++ show ers

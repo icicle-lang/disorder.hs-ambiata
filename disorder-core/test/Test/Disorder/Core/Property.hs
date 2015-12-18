@@ -1,8 +1,10 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Test.Disorder.Core.Property where
 
+import           Control.Applicative       ((<$>))
 import           Data.AEq                  (AEq)
 import qualified Data.AEq                  as AEQ
+import           Data.List                 (delete)
 import           Data.Text                 (Text)
 
 import           Disorder.Core
@@ -48,6 +50,22 @@ prop_negEquals x y =
 prop_negXor :: (Arbitrary a, Show a, Eq a) => a -> a -> Property
 prop_negXor x y =
   (x === y) .^. neg (x === y)
+
+prop_areEquivalent :: (Eq a, Show a) => [a] -> Property
+prop_areEquivalent ls =
+  forAll (shuffle ls) $ \rs ->
+    ls =\\= rs
+  where
+    shuffle [] = return []
+    shuffle xs = do
+      x <- elements xs
+      (x:) <$> shuffle (delete x xs)
+
+prop_areNotEquivalent :: (Eq a, Show a) => [a] -> [a] -> Property
+prop_areNotEquivalent ls rs =
+ not (all (`elem`ls) rs && all (`elem`rs) ls) ==>
+   expectFailure $ ls =\\= rs
+
 
 return []
 tests :: IO Bool
