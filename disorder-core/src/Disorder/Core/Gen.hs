@@ -14,6 +14,8 @@ import           Control.Applicative
 import           Test.QuickCheck.Gen
 import           Test.QuickCheck.Utf8
 
+import           Prelude
+
 -- | Return a vector whose size is within the provided bounds
 vectorOfSize :: Int -> Int -> Gen a -> Gen [a]
 vectorOfSize min' max' gen =

@@ -8,14 +8,16 @@ module Disorder.Lens (
     ,   traversalPure
     ) where
 
-import Control.Applicative ( pure )
+import Control.Applicative as A ( pure )
 import Control.Lens ( Traversal', Prism', (^.) , (^?), (.~), mapped, re )
 import Test.QuickCheck ( Arbitrary, Property, (===), conjoin, property )
+
+import Prelude
 
 -- Prism Laws
 
 prismSymmetry :: (Show a, Eq a) => Prism' s a -> a -> Property
-prismSymmetry l y = (y ^. re l) ^? l === pure y
+prismSymmetry l y = (y ^. re l) ^? l === A.pure y
 
 prismConverseSymmetry :: (Show s, Eq s) => Prism' s a -> s -> Property
 prismConverseSymmetry l x = fmap (^. re l) (x ^? l) === (mapped .~ x) (x ^? l)

@@ -11,6 +11,8 @@ import           Disorder.Corpus
 
 import           Test.QuickCheck
 
+import           Prelude
+
 -- Not much to test here, this is just an example of using the corpus for maximum humour:
 
 newtype Laugh =

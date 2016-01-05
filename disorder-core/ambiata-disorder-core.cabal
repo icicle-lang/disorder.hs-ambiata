@@ -13,7 +13,7 @@ description:           disorder-core.
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , QuickCheck                      == 2.7.*
+                     , QuickCheck                      == 2.8.*
                      , directory                       == 1.2.*
                      , ieee754                         == 0.7.*
                      , quickcheck-text                 == 0.1.*

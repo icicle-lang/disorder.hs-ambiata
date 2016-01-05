@@ -8,6 +8,7 @@ import           Data.Time
 
 import           Test.QuickCheck
 
+import           Prelude
 
 genTime :: Gen UTCTime
 genTime = UTCTime

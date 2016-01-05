@@ -7,6 +7,8 @@ import           Data.Monoid
 import           Data.Function
 import           Test.QuickCheck
 
+import           Prelude
+
 -- | Generalized round-trip property function
 tripping :: (Applicative f, Show (f a), Eq (f a)) => (a -> b) -> (b -> f a) -> a -> Property
 tripping = trippingOn id

@@ -7,6 +7,7 @@ import           Control.Applicative
 
 import           Test.QuickCheck
 
+import           Prelude
 
 data OrdPair a =
   OrdPair a a

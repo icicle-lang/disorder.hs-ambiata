@@ -11,6 +11,7 @@ import           System.Process
 import           System.Exit
 import           System.IO
 
+import           Prelude
 
 disorderMain :: [IO Bool] -> IO ()
 disorderMain tests =

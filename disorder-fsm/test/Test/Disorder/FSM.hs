@@ -15,6 +15,7 @@ import           Disorder.FSM
 import           Test.QuickCheck
 import           Test.QuickCheck.Monadic
 
+import           Prelude
 
 newtype Stack a = Stack {
     _toRef :: IORef [a]
