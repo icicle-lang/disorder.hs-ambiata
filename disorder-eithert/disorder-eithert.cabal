@@ -1,0 +1,29 @@
+name:                  ambiata-disorder-eithert
+version:               0.0.1
+license:               AllRightsReserved
+author:                Ambiata <info@ambiata.com>
+maintainer:            Ambiata <info@ambiata.com>
+copyright:             (c) 2015 Ambiata
+synopsis:              disorder-eithert
+category:              System
+cabal-version:         >= 1.8
+build-type:            Simple
+description:           disorder-eithert.
+
+library
+  build-depends:
+                       base                            >= 3          && < 5
+                     , QuickCheck                      == 2.7.*
+                     , text                            >= 1.1        && < 1.3
+                     , transformers                    == 0.4.*
+
+  ghc-options:
+                       -Wall
+
+  hs-source-dirs:
+                       src
+
+
+  exposed-modules:
+                       Paths_ambiata_disorder_eithert
+                       Disorder.Either
