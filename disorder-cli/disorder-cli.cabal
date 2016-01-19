@@ -13,6 +13,7 @@ description:           disorder-cli.
 library
   build-depends:
                        base                            >= 3          && < 5
+                     , clock                           == 0.5.*
                      , directory                       == 1.2.*
                      , ieee754                         == 0.7.*
                      , process                         == 1.2.*
