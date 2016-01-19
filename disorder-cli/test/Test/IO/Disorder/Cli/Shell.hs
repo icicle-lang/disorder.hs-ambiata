@@ -17,6 +17,8 @@ import           Test.QuickCheck.Monadic
 
 import           Turtle
 
+import           Prelude
+
 boring :: Gen Text
 boring = fmap T.pack . listOf1 $ elements (['a'..'z'] <> ['A'..'Z'] <> ['0'..'9'])
 
