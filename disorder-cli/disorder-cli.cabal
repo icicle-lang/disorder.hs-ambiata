@@ -37,7 +37,7 @@ test-suite test-io
   ghc-options:         -Wall -threaded -O2
   hs-source-dirs:      test
   build-depends:       base                            >= 3           && < 5
-                     , QuickCheck                      == 2.7.*
+                     , QuickCheck                      == 2.8.*
                      , ambiata-disorder-cli
                      , directory                       == 1.2.*
                      , ieee754                         == 0.7.*
