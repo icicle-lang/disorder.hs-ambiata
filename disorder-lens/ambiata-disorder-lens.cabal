@@ -14,7 +14,7 @@ library
   build-depends:
                        base                            >= 3          && < 5
                      , lens                            >= 4.6        && < 4.10
-                     , QuickCheck                      == 2.8.*
+                     , QuickCheck                      >= 2.7        && < 2.9
 
   ghc-options:
                        -Wall
@@ -41,4 +41,4 @@ test-suite test
                        base                            >= 3          && < 5
                      , ambiata-disorder-lens
                      , lens
-                     , QuickCheck
+                     , QuickCheck                      >= 2.8.2      && < 2.9
