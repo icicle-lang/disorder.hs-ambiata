@@ -40,5 +40,5 @@ test-suite test
                        base                            >= 3          && < 5
                      , ambiata-disorder-corpus
                      , text
-                     , QuickCheck                      == 2.7.*
+                     , QuickCheck                      >= 2.8.2      && < 2.9
 

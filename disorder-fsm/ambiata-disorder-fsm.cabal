@@ -15,7 +15,7 @@ library
                        base                            >= 3          && < 5
                      , transformers                    >= 0.3        && < 0.5
                      , exceptions                      == 0.8.*
-                     , QuickCheck                      == 2.8.*
+                     , QuickCheck                      >= 2.7        && < 2.9
 
   ghc-options:
                        -Wall

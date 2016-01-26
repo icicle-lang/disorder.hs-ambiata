@@ -15,7 +15,7 @@ library
                        base                            >= 3          && < 5
                      , aeson                           == 0.8.*
                      , ambiata-disorder-core
-                     , QuickCheck                      == 2.8.*
+                     , QuickCheck                      >= 2.7        && < 2.9
                      , time
 
   ghc-options:
@@ -44,5 +44,5 @@ test-suite test
                        base                            >= 3          && < 5
                      , ambiata-disorder-aeson
                      , aeson
-                     , QuickCheck
+                     , QuickCheck                      >= 2.8.2      && < 2.9
                      , time
