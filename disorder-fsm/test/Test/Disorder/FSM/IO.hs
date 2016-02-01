@@ -150,31 +150,31 @@ genFailIf p =
 prop_success :: Property
 prop_success = monadicIO $ do
   s <- liftIO empty
-  runFSMGen s [] . oneof $ [genPush, genPop, genTop, genSize]
+  runFSMGen s [] $ shuffle [genPush, genPop, genTop, genSize]
 
 prop_test :: Property
 prop_test = monadicIO $ do
   s <- liftIO empty
-  runFSMGen s [] . oneof $ [genTop]
+  runFSMGen s [] $ shuffle [genTop]
 
 -- | fails due to invalid 'pop'
 prop_pop_assert_error :: Property
 prop_pop_assert_error = expectFailure . monadicIO $ do
   s <- liftIO empty
-  runFSMGen s [] . oneof $ [genPush, genInvalidPop, genTop, genSize]
+  runFSMGen s [] $ shuffle [genPush, genInvalidPop, genTop, genSize]
 
 -- | fails due to invalid 'push'
 prop_push_assert_error :: Property
 prop_push_assert_error = expectFailure . monadicIO $ do
   s <- liftIO empty
-  runFSMGen s [] . oneof $ [genInvalidPush, genPush, genPop, genTop, genSize]
+  runFSMGen s [] $ shuffle [genInvalidPush, genPush, genPop, genTop, genSize]
 
 -- | Produces "invalid" transition less frequently
 --   thus generating longer transition list
 prop_assert_error_longer_chain :: Property
 prop_assert_error_longer_chain = expectFailure . monadicIO $ do
   s <- liftIO empty
-  runFSMUntil 100 s [] . frequency $ [
+  runFSMUntil 100 s [] . frequencyShuffle $ [
       (10, genPush)
     , (1, genInvalidPush)
     , (10, genTop)
@@ -187,20 +187,20 @@ prop_assert_error_longer_chain = expectFailure . monadicIO $ do
 prop_state_exception :: Property
 prop_state_exception =  expectFailure . monadicIO $ do
   s <- liftIO empty
-  runFSMGen s [] . oneof $ [genPush, genPopException, genTop, genSize]
+  runFSMGen s [] $ shuffle  [genPush, genPopException, genTop, genSize]
 
 
 prop_limitedByCount :: Property
-prop_limitedByCount = once . mapSize (const 10) . monadicIO $ do
+prop_limitedByCount = once . monadicIO $ do
   s <- liftIO empty
-  runFSMUntil 10 s [] . oneof $ [genPush, genFailIf ((>10) . length)]
+  runFSMUntil 10 s [] $ shuffle  [genPush, genFailIf ((>10) . length)]
 
 
 prop_limitedByTime :: Property
-prop_limitedByTime = once . mapSize (const 10) . monadicIO $ do
+prop_limitedByTime = once . monadicIO $ do
   s <- liftIO empty
   -- Execution is limited by 1 second
-  runFSMFor (fromRational 1) s [] . oneof $ [genSlowPush, genFailIf ((>10) . length)]
+  runFSMFor (fromRational 1) s [] $ shuffle  [genSlowPush, genFailIf ((>10) . length)]
 
 
 -- Doesn't look like it is possible to specify in QC
@@ -210,7 +210,7 @@ prop_limitedByTime = once . mapSize (const 10) . monadicIO $ do
 -- prop_no_valid_transition :: Property
 -- prop_no_valid_transition = once . expectFailure . monadicIO $ do
 --   s <- liftIO empty
---   runFSMUntil 10 s [] genPop
+--   runFSMUntil 10 s [] $ pure [genPop]
 
 
 return []

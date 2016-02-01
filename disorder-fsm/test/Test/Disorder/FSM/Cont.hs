@@ -166,7 +166,7 @@ genFailIf p =
 prop_success_chain :: Property
 prop_success_chain = monadicCont $ do
   d <- lift $ withSystemTempDirectoryCont "prop_success_chain"
-  runFSMGen (Environment d) mkFileSystem . frequency $ [
+  runFSMGen (Environment d) mkFileSystem . frequencyShuffle $ [
       (10, genCreateFile)
     , (1, genCloseFile)
     , (10, genWriteFile)
@@ -178,7 +178,7 @@ prop_success_chain = monadicCont $ do
 prop_failure_chain :: Property
 prop_failure_chain = expectFailure . monadicCont $ do
   d <- lift $ withSystemTempDirectoryCont "prop_successful_chain"
-  runFSMGen (Environment d) mkFileSystem . frequency $ [
+  runFSMGen (Environment d) mkFileSystem . frequencyShuffle $ [
       (10, genCreateFile)
     , (1, genCloseFile)
     , (10, genWriteFile)
@@ -191,15 +191,19 @@ prop_failure_chain = expectFailure . monadicCont $ do
 prop_limitedByCount :: Property
 prop_limitedByCount = monadicCont $ do
   d <- lift $ withSystemTempDirectoryCont "prop_limitByCount"
-  runFSMUntil 10 (Environment d) mkFileSystem .
-    oneof $ [genCreateFile, genFailIf ((>10) . M.size . fileSystemFiles)]
+  runFSMUntil 10 (Environment d) mkFileSystem . shuffle $ [
+      genCreateFile
+    , genFailIf ((>10) . M.size . fileSystemFiles)
+    ]
 
 
 prop_limitedByTime :: Property
 prop_limitedByTime = once . mapSize (const 10) . monadicCont $ do
   d <- lift $ withSystemTempDirectoryCont "prop_limitByCount"
-  runFSMFor (fromRational 1) (Environment d) mkFileSystem .
-    oneof $ [genSlowCreateFile, genFailIf ((>10) . M.size . fileSystemFiles)]
+  runFSMFor (fromRational 1) (Environment d) mkFileSystem . shuffle $ [
+      genSlowCreateFile
+    , genFailIf ((>10) . M.size . fileSystemFiles)
+    ]
 
 
 pickOpenFile :: FileSystem -> Gen (Maybe (FilePath, File))

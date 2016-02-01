@@ -13,7 +13,7 @@ module Disorder.FSM.Core (
   , liftGen
   -- * Transition evaluation
   , runFSM
-  -- * Transition evaluation
+  -- * Utility functions
   , mapPropertyM
   , mapContT'
   , pickGen

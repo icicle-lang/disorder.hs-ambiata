@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -96,25 +97,27 @@ newtype RunnerT e s m a = RunnerT {
 runRunnerT :: Monad m => e -> s -> RunnerT e s m a -> m a
 runRunnerT e s = return . fst <=< (\m -> evalRWST m e s) . toRWST
 
-runFSMGen :: (MonadCatch m, Show s) => e -> s -> Gen (ConditionalTransition e s m) -> PropertyM m ()
-runFSMGen e s g = do
-  n <- pickGen arbitrary :: PropertyM m Int
-  runFSMUntil n e s g
 
-runFSMUntil :: (MonadCatch m, Show s) => Int -> e -> s -> Gen (ConditionalTransition e s m) -> PropertyM m ()
+runFSMGen :: (MonadCatch m, Show s) => e -> s -> Gen [Gen (ConditionalTransition e s m)] -> PropertyM m ()
+runFSMGen e s gs = do
+  n <- pickGen arbitrary :: PropertyM m Int
+  runFSMUntil n e s gs
+
+
+runFSMUntil :: (MonadCatch m, Show s) => Int -> e -> s -> Gen [Gen (ConditionalTransition e s m)] -> PropertyM m ()
 runFSMUntil n e s =
   runFSMWith
     ((runRunnerT e s) . (runCounter n))
     (lift . lift)
     . limitByCount . fromStatefulTransition
 
-runFSMFor :: (MonadIO m, MonadCatch m, Show s) => NominalDiffTime -> e -> s -> Gen (ConditionalTransition e s m) -> PropertyM m ()
-runFSMFor d e s g = do
+runFSMFor :: (MonadIO m, MonadCatch m, Show s) => NominalDiffTime -> e -> s -> Gen [Gen (ConditionalTransition e s m)] -> PropertyM m ()
+runFSMFor d e s gs = do
   t0 <- liftIO $ getCurrentTime
   runFSMWith
     ((runRunnerT e s) . (runTimer t0 d))
     (lift . lift)
-    . limitByTime . fromStatefulTransition $ g
+    . limitByTime . fromStatefulTransition $ gs
 
 
 runFSMWith :: (MonadState s m, MonadCatch m, Show s)
@@ -124,14 +127,20 @@ runFSMWith l u =
   mapPropertyM l u . runFSM
 
 
-fromStatefulTransition :: Monad m => Gen (ConditionalTransition e s m) -> PropertyM (RunnerT e s m) (Maybe (Transition (RunnerT e s m) ()))
-fromStatefulTransition g = do
+fromStatefulTransition :: Monad m => Gen [Gen (ConditionalTransition e s m)] -> PropertyM (RunnerT e s m) (Maybe (Transition (RunnerT e s m) ()))
+fromStatefulTransition ggs = do
   e <- lift ask
   s <- lift get
-  mt <- pickGen $ g `suchThatMaybe` \t -> preCond t e s
-  case mt of
-    Nothing -> stop rejected
-    Just t -> return . Just . toTransition $ t
+  gs <- pickGen $ ggs
+  let go = \case
+        [] -> stop rejected
+        (g:gs') -> do
+          mt <- pickGen $ g `suchThatMaybe` \t -> preCond t e s
+          case mt of
+            Nothing -> go gs'
+            Just t -> return . Just . toTransition $ t
+  go gs
+
 
 
 limitByCount :: Monad m
