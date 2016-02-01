@@ -7,6 +7,8 @@ module Disorder.Corpus (
   , viruses
   , colours
   , weather
+  , waters
+  , boats
   ) where
 
 import           Data.Text
@@ -94,4 +96,56 @@ weather = [
   , "fresh"
   , "windy"
   , "freezing"
+  ]
+
+waters :: [Text]
+waters = [
+    "basin"
+  , "bay"
+  , "billabong"
+  , "canal"
+  , "channel"
+  , "creek"
+  , "estuary"
+  , "fjord"
+  , "harbour"
+  , "lake"
+  , "loch"
+  , "marsh"
+  , "ocean"
+  , "pond"
+  , "puddle"
+  , "reservoir"
+  , "river"
+  , "sea"
+  , "slough"
+  , "sound"
+  , "spring"
+  , "stream"
+  , "swamp"
+  , "wetland"
+  ]
+
+boats :: [Text]
+boats = [
+    "barge"
+  , "battleship"
+  , "canoe"
+  , "catamaran"
+  , "dinghy"
+  , "ferry"
+  , "gondola"
+  , "jetski"
+  , "kayak"
+  , "longship"
+  , "motorboat"
+  , "pontoon"
+  , "powerboat"
+  , "rowboat"
+  , "ship"
+  , "steamboat"
+  , "tanker"
+  , "trawler"
+  , "tugboat"
+  , "yacht"
   ]
