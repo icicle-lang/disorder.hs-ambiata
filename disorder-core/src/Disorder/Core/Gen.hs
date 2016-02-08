@@ -2,6 +2,8 @@ module Disorder.Core.Gen (
     vectorOfSize
   , chooseSize
   , maybeGen
+  , smaller
+  , listOfSized
   -- * re-exports from quickcheck-text
   , genValidUtf8
   , genValidUtf81
@@ -32,3 +34,12 @@ maybeGen g = sized $ \s ->
   frequency [
     (1, return Nothing),
     (s, Just <$> resize (s `div` 2) g)]
+
+-- | Generate something smaller
+smaller :: Gen a -> Gen a
+smaller g =
+  sized $ \s -> resize (s `div` 2) g
+
+-- | Generate a list this big.
+listOfSized :: Gen a -> Int -> Gen [a]
+listOfSized gen n = take n <$> infiniteListOf gen
