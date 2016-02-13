@@ -13,9 +13,12 @@ description:           Final state machine testing.
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , transformers                    >= 0.3        && < 0.5
+                     , containers                      >= 0.5        && < 0.7
                      , exceptions                      == 0.8.*
+                     , mtl                             >= 2.1        && < 2.3
                      , QuickCheck                      >= 2.7        && < 2.9
+                     , time
+                     , transformers                    >= 0.3        && < 0.5
 
   ghc-options:
                        -Wall
@@ -27,6 +30,10 @@ library
   exposed-modules:
                        Paths_ambiata_disorder_fsm
                        Disorder.FSM
+                       Disorder.FSM.Catch
+                       Disorder.FSM.Core
+                       Disorder.FSM.Property
+                       Disorder.FSM.Runner
 
 test-suite test
   type:                exitcode-stdio-1.0
@@ -40,6 +47,9 @@ test-suite test
 
   build-depends:
                        base
-                     , transformers
-                     , QuickCheck
                      , ambiata-disorder-fsm
+                     , containers
+                     , mtl
+                     , QuickCheck
+                     , temporary                      >= 1.1        && < 1.3
+                     , transformers
