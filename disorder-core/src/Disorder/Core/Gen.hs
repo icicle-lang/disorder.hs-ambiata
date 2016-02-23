@@ -2,6 +2,7 @@ module Disorder.Core.Gen (
     vectorOfSize
   , chooseSize
   , maybeGen
+  , genFromMaybe
   , smaller
   , listOfSized
   -- * re-exports from quickcheck-text
@@ -12,6 +13,8 @@ module Disorder.Core.Gen (
   ) where
 
 import           Control.Applicative
+
+import           Data.Maybe (isJust)
 
 import           Test.QuickCheck.Gen
 import           Test.QuickCheck.Utf8
@@ -34,6 +37,16 @@ maybeGen g = sized $ \s ->
   frequency [
     (1, return Nothing),
     (s, Just <$> resize (s `div` 2) g)]
+
+-- | Wait for a generated `Just` value
+--
+-- Use _only_ in case of emergencies when you have no other way to get an `a` safely
+genFromMaybe :: Gen (Maybe a) -> Gen a
+genFromMaybe g =
+  suchThat g isJust >>= \ma ->
+    case ma of
+      Just a -> pure a
+      Nothing -> fail "Disorder.Core.Gen.genFromMaybe: Failed to generate a Just"
 
 -- | Generate something smaller
 smaller :: Gen a -> Gen a

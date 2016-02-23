@@ -30,6 +30,12 @@ prop_maybeGen = testIO $ do
     in  (length justs >= 8000) .&.
         (length nothings >= 100)
 
+prop_genFromMaybe :: Property
+prop_genFromMaybe =
+  testIO $ do
+    ma <- generate $ genFromMaybe (arbitrary :: Gen (Maybe ()))
+    return $ ma == ()
+
 return []
 tests :: IO Bool
 tests = $quickCheckAll
