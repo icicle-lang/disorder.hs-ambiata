@@ -57,6 +57,7 @@ test-suite test
                      , text
                      , quickcheck-instances            == 0.3.*
                      , ieee754                         == 0.7.*
+                     , transformers                    >= 0.3        && < 1
 
 test-suite test-cli
   type:                exitcode-stdio-1.0

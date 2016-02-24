@@ -12,7 +12,7 @@ import           Test.QuickCheck.Monadic
 import           System.CPUTime (getCPUTime)
 
 testIO :: Testable a => IO a -> Property
-testIO = monadicIO . (=<<) stop . run
+testIO = testPropertyIO . run
 
 testPropertyIO :: Testable a => PropertyM IO a -> Property
 testPropertyIO = monadicIO . (=<<) stop
