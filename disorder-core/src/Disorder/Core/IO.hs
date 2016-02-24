@@ -1,5 +1,6 @@
 module Disorder.Core.IO (
     testIO
+  , testPropertyIO
   , withCPUTime
   ) where
 
@@ -12,6 +13,9 @@ import           System.CPUTime (getCPUTime)
 
 testIO :: Testable a => IO a -> Property
 testIO = monadicIO . (=<<) stop . run
+
+testPropertyIO :: Testable a => PropertyM IO a -> Property
+testPropertyIO = monadicIO . (=<<) stop
 
 -- | Perform an action and return the CPU time it takes, in picoseconds
 -- (actual precision varies with implementation).
