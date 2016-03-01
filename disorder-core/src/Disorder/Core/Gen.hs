@@ -5,6 +5,7 @@ module Disorder.Core.Gen (
   , genFromMaybe
   , smaller
   , listOfSized
+  , genEnum
   -- * re-exports from quickcheck-text
   , genValidUtf8
   , genValidUtf81
@@ -56,3 +57,7 @@ smaller g =
 -- | Generate a list this big.
 listOfSized :: Gen a -> Int -> Gen [a]
 listOfSized gen n = take n <$> infiniteListOf gen
+
+genEnum :: (Bounded a, Enum a) => Gen a
+genEnum =
+  elements [minBound..maxBound]
