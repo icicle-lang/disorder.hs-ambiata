@@ -3,7 +3,10 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Disorder.Corpus (
-    Cooking(..)
+    genCorpus
+  , shrinkCorpus
+
+  , Cooking(..)
   , unCooking
   , cooking
 
