@@ -4,6 +4,7 @@ module Disorder.Core.Gen (
   , maybeGen
   , genFromMaybe
   , smaller
+  , oneofSized
   , listOfSized
   , genEnum
   -- * re-exports from quickcheck-text
@@ -53,6 +54,31 @@ genFromMaybe g =
 smaller :: Gen a -> Gen a
 smaller g =
   sized $ \s -> resize (s `div` 2) g
+
+-- | Take list of small generators and list of large generators.
+-- Look at the size of what we want to create, and use either small or both.
+--
+-- This is useful for generators for recursive datatypes: one can pass generators
+-- for the leaf nodes as the first argument, and branches for the second argument.
+-- The second arguments will be called with a smaller size, so if this is used
+-- recursively, the size will continue to reduce until only leaves are available.
+--
+-- For example, a tree might use:
+--
+-- > gen_tree = oneofSized
+-- >  [ Leaf1 <$> arbitrary, Leaf2 <$> arbitrary ]
+-- >  [ Branch <$> gen_tree ]
+--
+-- Because (Branch <$> gen_tree) will only be called when the size is greater than 1,
+-- and gen_tree will be called with a smaller size, this makes an infinite chain
+-- of branches impossible.
+oneofSized :: [Gen a] -> [Gen a] -> Gen a
+oneofSized smalls bigs = sized $ \s ->
+  if   s <= 1
+  then oneof  smalls
+  else oneof (smalls ++ bigs')
+ where
+  bigs'   = fmap smaller bigs
 
 -- | Generate a list this big.
 listOfSized :: Gen a -> Int -> Gen [a]
