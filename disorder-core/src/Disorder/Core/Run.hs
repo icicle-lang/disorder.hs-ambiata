@@ -5,6 +5,7 @@ module Disorder.Core.Run (
     disorderCheckEnv
   , disorderCheckEnvWith
   , disorderCheckEnvAll
+  , disorderCheckAll
   , disorderEnvArgs
   , ExpectedTestSpeed(..)
   ) where
@@ -67,3 +68,7 @@ readEnv name = do
 disorderCheckEnvAll :: Q Exp
 disorderCheckEnvAll =
  [| \speed -> $(forAllProperties) (disorderCheckEnv speed) |]
+
+disorderCheckAll :: Q Exp
+disorderCheckAll =
+ [| $(forAllProperties) (disorderCheckEnv TestRunNormal) |]

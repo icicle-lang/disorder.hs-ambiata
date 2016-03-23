@@ -39,4 +39,4 @@ prop_genFromMaybe =
 
 return []
 tests :: IO Bool
-tests = $disorderCheckEnvAll TestRunNormal
+tests = $disorderCheckAll
