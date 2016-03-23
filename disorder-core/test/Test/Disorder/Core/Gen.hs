@@ -4,6 +4,7 @@ module Test.Disorder.Core.Gen where
 import           Disorder.Core.Gen
 import           Disorder.Core.IO
 import           Disorder.Core.OrdPair
+import           Disorder.Core.Run
 
 import           Test.QuickCheck
 import           Data.Maybe
@@ -38,4 +39,4 @@ prop_genFromMaybe =
 
 return []
 tests :: IO Bool
-tests = $quickCheckAll
+tests = $disorderCheckAll

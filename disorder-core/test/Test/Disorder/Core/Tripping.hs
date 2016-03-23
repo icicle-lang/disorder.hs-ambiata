@@ -28,4 +28,4 @@ prop_tripping_with_neg =
   neg . property $ trippingWith ((===) `on` fmap (+1)) id (const Nothing :: Int -> Maybe Int)
 
 return []
-tests = $quickCheckAll
+tests = $disorderCheckEnvAll TestRunMore

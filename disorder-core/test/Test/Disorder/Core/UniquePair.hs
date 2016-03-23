@@ -3,6 +3,7 @@ module Test.Disorder.Core.UniquePair where
 
 import           Disorder.Core.Property
 import           Disorder.Core.UniquePair
+import           Disorder.Core.Run
 
 import           Test.QuickCheck
 
@@ -13,4 +14,4 @@ prop_uniquePair (UniquePair a b) = a =/= b
 
 return []
 tests :: IO Bool
-tests = $quickCheckAll
+tests = $disorderCheckEnvAll TestRunMore
