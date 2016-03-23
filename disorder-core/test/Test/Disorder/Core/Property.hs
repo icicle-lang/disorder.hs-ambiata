@@ -71,4 +71,4 @@ prop_areNotEquivalent ls rs =
 
 return []
 tests :: IO Bool
-tests = $quickCheckAll
+tests = $disorderCheckEnvAll TestRunFast

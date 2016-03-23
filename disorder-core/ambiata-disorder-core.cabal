@@ -20,6 +20,7 @@ library
                      , process                         == 1.2.*
                      , text                            >= 1.1        && < 1.3
                      , transformers                    >= 0.3        && < 1
+                     , template-haskell                >= 2.4
 
   ghc-options:
                        -Wall
@@ -36,6 +37,7 @@ library
                        Disorder.Core.Main
                        Disorder.Core.OrdPair
                        Disorder.Core.Property
+                       Disorder.Core.Run
                        Disorder.Core.Tripping
                        Disorder.Core.UniquePair
                        Disorder.Core.QuickCheck

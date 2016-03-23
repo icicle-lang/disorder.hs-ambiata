@@ -2,6 +2,7 @@
 module Test.Disorder.Core.IO where
 
 import           Disorder.Core.IO
+import           Disorder.Core.Run
 
 import           Control.Monad.IO.Class
 import           Test.QuickCheck
@@ -17,4 +18,4 @@ prop_falseDoesNotFail
 
 return []
 tests :: IO Bool
-tests = $quickCheckAll
+tests = $disorderCheckEnvAll TestRunSlow
