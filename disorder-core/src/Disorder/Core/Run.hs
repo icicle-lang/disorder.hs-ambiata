@@ -21,9 +21,9 @@ import           Prelude
 import           Language.Haskell.TH
 
 data ExpectedTestSpeed
- = TestRunFast
+ = TestRunMore
  | TestRunNormal
- | TestRunSlow
+ | TestRunFewer
  deriving (Eq, Ord, Show)
 
 disorderCheckEnv :: Testable prop => ExpectedTestSpeed -> prop -> IO Result
@@ -43,16 +43,16 @@ disorderEnvArgs speed args = do
 disorderSpeedEnvArg :: ExpectedTestSpeed -> String
 disorderSpeedEnvArg =
  \case
-  TestRunFast   -> "DISORDER_RUN_FAST"
+  TestRunMore   -> "DISORDER_RUN_MORE"
   TestRunNormal -> "DISORDER_RUN_NORMAL"
-  TestRunSlow   -> "DISORDER_RUN_SLOW"
+  TestRunFewer  -> "DISORDER_RUN_FEWER"
 
 disorderSpeedDefaultRuns :: ExpectedTestSpeed -> Int
 disorderSpeedDefaultRuns =
  \case
-  TestRunFast   -> 1000
+  TestRunMore   -> 1000
   TestRunNormal -> 100
-  TestRunSlow   -> 10
+  TestRunFewer  -> 10
 
 
 readEnv :: String -> IO (Maybe Int)

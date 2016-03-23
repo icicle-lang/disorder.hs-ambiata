@@ -13,4 +13,4 @@ prop_uniquePair (OrdPair a b) = a <= b
 
 return []
 tests :: IO Bool
-tests = $disorderCheckEnvAll TestRunFast
+tests = $disorderCheckEnvAll TestRunMore

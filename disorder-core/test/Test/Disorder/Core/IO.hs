@@ -18,4 +18,4 @@ prop_falseDoesNotFail
 
 return []
 tests :: IO Bool
-tests = $disorderCheckEnvAll TestRunSlow
+tests = $disorderCheckEnvAll TestRunFewer
