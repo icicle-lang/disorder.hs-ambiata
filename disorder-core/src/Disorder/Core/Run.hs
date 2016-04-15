@@ -25,6 +25,7 @@ data ExpectedTestSpeed
  = TestRunMore
  | TestRunNormal
  | TestRunFewer
+ | TestRunUnit
  deriving (Eq, Ord, Show)
 
 disorderCheckEnv :: Testable prop => ExpectedTestSpeed -> prop -> IO Result
@@ -47,6 +48,7 @@ disorderSpeedEnvArg =
   TestRunMore   -> "DISORDER_RUN_MORE"
   TestRunNormal -> "DISORDER_RUN_NORMAL"
   TestRunFewer  -> "DISORDER_RUN_FEWER"
+  TestRunUnit   -> "DISORDER_RUN_UNIT"
 
 disorderSpeedDefaultRuns :: ExpectedTestSpeed -> Int
 disorderSpeedDefaultRuns =
@@ -54,6 +56,7 @@ disorderSpeedDefaultRuns =
   TestRunMore   -> 1000
   TestRunNormal -> 100
   TestRunFewer  -> 10
+  TestRunUnit   -> 1
 
 
 readEnv :: String -> IO (Maybe Int)
