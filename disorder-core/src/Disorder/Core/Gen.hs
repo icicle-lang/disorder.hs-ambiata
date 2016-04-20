@@ -7,6 +7,8 @@ module Disorder.Core.Gen (
   , oneofSized
   , listOfSized
   , genEnum
+  , listWithIndex
+  , listOfSizedWithIndex
   -- * re-exports from quickcheck-text
   , genValidUtf8
   , genValidUtf81
@@ -87,3 +89,12 @@ listOfSized gen n = take n <$> infiniteListOf gen
 genEnum :: (Bounded a, Enum a) => Gen a
 genEnum =
   elements [minBound..maxBound]
+
+listWithIndex :: (Int -> Gen a) -> Gen [a]
+listWithIndex g =
+  sized $ \i -> listOfSizedWithIndex 0 i g
+
+listOfSizedWithIndex :: Int -> Int -> (Int -> Gen a) -> Gen [a]
+listOfSizedWithIndex from to g =
+  chooseSize from to >>=
+    mapM g . enumFromTo 0
