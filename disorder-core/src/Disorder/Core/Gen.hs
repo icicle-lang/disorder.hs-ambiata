@@ -1,19 +1,27 @@
 module Disorder.Core.Gen (
-    vectorOfSize
+    GenSeed(..)
   , chooseSize
-  , maybeGen
-  , genFromMaybe
-  , smaller
-  , oneofSized
-  , listOfSized
+  , genDeterministic
+  , genDeterministic'
   , genEnum
-  , listWithIndex
-  , listOfSizedWithIndex
+  , genFromMaybe
+
   -- * re-exports from quickcheck-text
   , genValidUtf8
   , genValidUtf81
+
+  , listOfSized
+  , listOfSizedWithIndex
+  , listWithIndex
+  , maybeGen
+  , oneofSized
+  , smaller
+
+  -- * re-exports from quickcheck-text
   , utf8BS
   , utf8BS1
+
+  , vectorOfSize
   ) where
 
 import           Control.Applicative
@@ -21,6 +29,7 @@ import           Control.Applicative
 import           Data.Maybe (isJust)
 
 import           Test.QuickCheck.Gen
+import           Test.QuickCheck.Random
 import           Test.QuickCheck.Utf8
 
 import           Prelude
@@ -98,3 +107,19 @@ listOfSizedWithIndex :: Int -> Int -> (Int -> Gen a) -> Gen [a]
 listOfSizedWithIndex from to g =
   chooseSize from to >>=
     mapM g . enumFromTo 0
+
+newtype GenSeed =
+  GenSeed {
+    unGenSeed :: Int
+  } deriving (Eq, Show)
+
+-- | Deterministic generator with a default size of 100.
+genDeterministic :: GenSeed -> Gen a -> a
+genDeterministic = genDeterministic' 100
+
+-- | Deterministic generator, always produces the same output for the same
+-- seed.
+genDeterministic' :: Int -> GenSeed -> Gen a -> a
+genDeterministic' size (GenSeed seed) (MkGen g) =
+  let r = mkQCGen seed in
+  g r size
