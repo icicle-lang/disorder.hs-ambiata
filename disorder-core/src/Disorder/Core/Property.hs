@@ -1,6 +1,7 @@
 module Disorder.Core.Property (
     (=/=)
   , (~~~)
+  , (###)
   , (.^.)
   , (<=>)
   , (=\\=)
@@ -30,6 +31,19 @@ x ~~~ y = counterexample cex prop
   where
     cex  = concat ["|", show x, " - ", show y, "| > ɛ"]
     prop = x AEQ.~== y
+
+infix 4 ###
+
+-- | Approximately-equal property for floats, which also verifies that
+-- both arguments are real numbers (i.e., not NaN or infinity).
+(###) :: (AEq a, Show a, RealFloat a) => a -> a -> Property
+x ### y = conjoin [counterexample unreal realProp, x ~~~ y]
+  where
+    unreal = unwords ["Argument is not a real number:", show x, show y]
+
+    realProp = all real [x, y]
+
+    real z = (not $ isNaN z) && (not $ isInfinite z)
 
 failWith :: Text -> Property
 failWith =
