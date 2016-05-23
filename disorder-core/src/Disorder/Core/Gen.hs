@@ -5,18 +5,22 @@ module Disorder.Core.Gen (
   , genDeterministic'
   , genEnum
   , genFromMaybe
+
   -- * re-exports from quickcheck-text
   , genValidUtf8
   , genValidUtf81
+
   , listOfSized
   , listOfSizedWithIndex
   , listWithIndex
   , maybeGen
   , oneofSized
   , smaller
+
   -- * re-exports from quickcheck-text
   , utf8BS
   , utf8BS1
+
   , vectorOfSize
   ) where
 
