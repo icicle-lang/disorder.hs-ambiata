@@ -68,6 +68,26 @@ prop_areNotEquivalent ls rs =
  not (all (`elem`ls) rs && all (`elem`rs) ls) ==>
    expectFailure $ ls =\\= rs
 
+prop_realEq_pos :: Int -> Property
+prop_realEq_pos x =
+  x' ### x'
+  where
+    x' :: Double
+    x' = fromIntegral x
+
+prop_realEq_neg :: Double -> Property
+prop_realEq_neg n = forAll (elements [0 / 0, n / 0] :: Gen Double) $ \bad ->
+  expectFailure $ bad ### bad
+
+prop_realEq_neq :: UniquePair Int -> Property
+prop_realEq_neq (UniquePair n m) =
+  expectFailure $ n' ### m'
+  where
+    n' :: Double
+    n' = fromIntegral n
+
+    m' :: Double
+    m' = fromIntegral m
 
 return []
 tests :: IO Bool
