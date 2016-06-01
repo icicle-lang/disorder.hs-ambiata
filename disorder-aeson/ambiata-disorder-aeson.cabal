@@ -12,8 +12,8 @@ description:           disorder-aeson.
 
 library
   build-depends:
-                       base                            >= 3          && < 5
-                     , aeson                           == 0.8.*
+                       base                            >= 3          && < 6
+                     , aeson                           >= 0.8        && < 0.12
                      , ambiata-disorder-core
                      , QuickCheck                      >= 2.7        && < 2.9
                      , time
@@ -41,7 +41,7 @@ test-suite test
                        test
 
   build-depends:
-                       base                            >= 3          && < 5
+                       base                            >= 3          && < 6
                      , ambiata-disorder-aeson
                      , aeson
                      , QuickCheck                      >= 2.8.2      && < 2.9
