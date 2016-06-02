@@ -1,7 +1,68 @@
 [boris]
   version = 1
 
-[build.dist]
+[build.dist-7-8]
+  command = [
+      ["master", "build", "dist-7-8", "-C", "disorder-core"]
+    , ["master", "build", "dist-7-8", "-C", "disorder-corpus"]
+    , ["master", "build", "dist-7-8", "-C", "disorder-cli"]
+    , ["master", "build", "dist-7-8", "-C", "disorder-aeson"]
+    , ["master", "build", "dist-7-8", "-C", "disorder-eithert"]
+    , ["master", "build", "dist-7-8", "-C", "disorder-fsm"]
+    , ["master", "build", "dist-7-8", "-C", "disorder-lens"]
+    ]
 
-[build.branches]
-  
+[build.dist-7-10]
+  command = [
+      ["master", "build", "dist-7-10", "-C", "disorder-core"]
+    , ["master", "build", "dist-7-10", "-C", "disorder-corpus"]
+    , ["master", "build", "dist-7-10", "-C", "disorder-cli"]
+    , ["master", "build", "dist-7-10", "-C", "disorder-aeson"]
+    , ["master", "build", "dist-7-10", "-C", "disorder-eithert"]
+    , ["master", "build", "dist-7-10", "-C", "disorder-fsm"]
+    , ["master", "build", "dist-7-10", "-C", "disorder-lens"]
+    ]
+
+[build.dist-8-0]
+  command = [
+      ["master", "build", "dist-8-0", "-C", "disorder-core"]
+    , ["master", "build", "dist-8-0", "-C", "disorder-corpus"]
+    , ["master", "build", "dist-8-0", "-C", "disorder-cli"]
+    , ["master", "build", "dist-8-0", "-C", "disorder-aeson"]
+    , ["master", "build", "dist-8-0", "-C", "disorder-eithert"]
+    , ["master", "build", "dist-8-0", "-C", "disorder-fsm"]
+    , ["master", "build", "dist-8-0", "-C", "disorder-lens"]
+    ]
+
+[build.branches-7-8]
+  command = [
+      ["master", "build", "branches-7-8", "-C", "disorder-core"]
+    , ["master", "build", "branches-7-8", "-C", "disorder-corpus"]
+    , ["master", "build", "branches-7-8", "-C", "disorder-cli"]
+    , ["master", "build", "branches-7-8", "-C", "disorder-aeson"]
+    , ["master", "build", "branches-7-8", "-C", "disorder-eithert"]
+    , ["master", "build", "branches-7-8", "-C", "disorder-fsm"]
+    , ["master", "build", "branches-7-8", "-C", "disorder-lens"]
+    ]
+
+[build.branches-7-10]
+  command = [
+      ["master", "build", "branches-7-10", "-C", "disorder-core"]
+    , ["master", "build", "branches-7-10", "-C", "disorder-corpus"]
+    , ["master", "build", "branches-7-10", "-C", "disorder-cli"]
+    , ["master", "build", "branches-7-10", "-C", "disorder-aeson"]
+    , ["master", "build", "branches-7-10", "-C", "disorder-eithert"]
+    , ["master", "build", "branches-7-10", "-C", "disorder-fsm"]
+    , ["master", "build", "branches-7-10", "-C", "disorder-lens"]
+    ]
+
+[build.branches-8-0]
+  command = [
+      ["master", "build", "branches-8-0", "-C", "disorder-core"]
+    , ["master", "build", "branches-8-0", "-C", "disorder-corpus"]
+    , ["master", "build", "branches-8-0", "-C", "disorder-cli"]
+    , ["master", "build", "branches-8-0", "-C", "disorder-aeson"]
+    , ["master", "build", "branches-8-0", "-C", "disorder-eithert"]
+    , ["master", "build", "branches-8-0", "-C", "disorder-fsm"]
+    , ["master", "build", "branches-8-0", "-C", "disorder-lens"]
+    ]
