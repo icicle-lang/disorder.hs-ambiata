@@ -1,0 +1,36 @@
+[master]
+  runner = "s3://ambiata-dispensary-v2/dist/master/master-haskell/linux/x86_64/0.0.1-20160601065828-f9e9fb3/master-haskell-0.0.1-20160601065828-f9e9fb3"
+  version = 1
+  sha1 = "c3e341a734f0938ab5352563db54d5db3137f766"
+
+[build.dist]
+  GHC_VERSION="7.10.2"
+  CABAL_VERSION = "1.22.4.0"
+
+[build.dist-7-8]
+  GHC_VERSION = "7.8.4"
+  CABAL_VERSION = "1.22.4.0"
+
+[build.branches-7-8]
+  GHC_VERSION = "7.8.4"
+  CABAL_VERSION = "1.22.4.0"
+
+[build.dist-7-10]
+  HADDOCK = "true"
+  HADDOCK_S3 = "$AMBIATA_HADDOCK_MASTER"
+  GHC_VERSION = "7.10.2"
+  CABAL_VERSION = "1.22.4.0"
+
+[build.branches-7-10]
+  HADDOCK = "true"
+  HADDOCK_S3 = "$AMBIATA_HADDOCK_BRANCHES"
+  GHC_VERSION = "7.10.2"
+  CABAL_VERSION = "1.22.4.0"
+
+[build.dist-8-0]
+  GHC_VERSION = "8.0.1"
+  CABAL_VERSION = "1.24.0.0"
+
+[build.branches-8-0]
+  GHC_VERSION = "8.0.1"
+  CABAL_VERSION = "1.24.0.0"
