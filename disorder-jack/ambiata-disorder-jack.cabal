@@ -1,0 +1,67 @@
+name:                  ambiata-disorder-jack
+version:               0.0.1
+license:               AllRightsReserved
+author:                Ambiata <info@ambiata.com>
+maintainer:            Ambiata <info@ambiata.com>
+copyright:             (c) 2015 Ambiata
+synopsis:              disorder-jack
+category:              System
+cabal-version:         >= 1.8
+build-type:            Simple
+description:           disorder-jack.
+
+library
+  build-depends:
+                       base                            >= 3          && < 5
+                     , ambiata-disorder-core
+                     , comonad                         >= 4.2        && < 5.1
+                     , containers                      >= 0.4        && < 0.6
+                     , deepseq                         >= 1.2        && < 1.5
+                     , pretty-show                     >= 1.6        && < 1.7
+                     , QuickCheck                      >= 2.7        && < 2.9
+                     , quickcheck-text                 >= 0.1        && < 0.2
+                     , random                          >= 1.1        && < 1.2
+                     , semigroups                      >= 0.16       && < 0.19
+                     , text                            >= 1.1        && < 1.3
+                     , transformers                    >= 0.3        && < 0.6
+
+  ghc-options:         -Wall
+
+  if impl(ghc >= 8.0)
+    ghc-options:       -fno-warn-redundant-constraints
+
+  hs-source-dirs:
+                       src
+
+
+  exposed-modules:
+                       Disorder.Jack
+                       Disorder.Jack.Combinators
+                       Disorder.Jack.Core
+                       Disorder.Jack.Property
+                       Disorder.Jack.Shrink
+                       Disorder.Jack.Tree
+
+test-suite test
+  type:                exitcode-stdio-1.0
+
+  main-is:             test.hs
+
+  ghc-options:         -Wall -threaded -O2
+
+  if impl(ghc >= 8.0)
+    ghc-options:       -fno-warn-redundant-constraints
+
+  hs-source-dirs:
+                       test
+
+  build-depends:
+                       base                            >= 3          && < 5
+                     , ambiata-disorder-core
+                     , ambiata-disorder-jack
+                     , comonad                         >= 4.2        && < 5.1
+                     , pretty-show                     >= 1.6        && < 1.7
+                     , QuickCheck                      >= 2.8.2      && < 2.9
+                     , quickcheck-instances            == 0.3.*
+                     , text                            >= 1.1        && < 1.3
+                     , transformers                    >= 0.3        && < 0.6
