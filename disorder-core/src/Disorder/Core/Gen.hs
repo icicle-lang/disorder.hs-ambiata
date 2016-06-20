@@ -5,23 +5,23 @@ module Disorder.Core.Gen (
   , genDeterministic'
   , genEnum
   , genFromMaybe
-
-  -- * re-exports from quickcheck-text
-  , genValidUtf8
-  , genValidUtf81
-
   , listOfSized
   , listOfSizedWithIndex
   , listWithIndex
   , maybeGen
   , oneofSized
   , smaller
+  , vectorOfSize
 
   -- * re-exports from quickcheck-text
+  , genValidUtf8
+  , genValidUtf81
+  , shrinkValidUtf8
+  , shrinkValidUtf81
+  , shrinkUtf8BS
+  , shrinkUtf8BS1
   , utf8BS
   , utf8BS1
-
-  , vectorOfSize
   ) where
 
 import           Control.Applicative
