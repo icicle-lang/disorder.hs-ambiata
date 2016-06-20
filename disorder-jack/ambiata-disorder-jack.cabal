@@ -36,6 +36,11 @@ library
 
   exposed-modules:
                        Disorder.Jack
+                       Disorder.Jack.Combinators
+                       Disorder.Jack.Core
+                       Disorder.Jack.Property
+                       Disorder.Jack.Shrink
+                       Disorder.Jack.Tree
 
 test-suite test
   type:                exitcode-stdio-1.0
