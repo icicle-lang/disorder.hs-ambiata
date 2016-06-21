@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 module Disorder.Jack.Shrink (
-    shrinkIntegral
+    shrinkTowards
 
   , sequenceShrink
   , sequenceShrinkOne
@@ -14,6 +14,7 @@ module Disorder.Jack.Shrink (
   , removes
   ) where
 
+import           Data.Eq (Eq(..))
 import           Data.Ord (Ord(..))
 import           Data.Functor (fmap)
 import           Data.Function (($), (.))
@@ -23,15 +24,34 @@ import           Data.Int (Int)
 
 import           Disorder.Jack.Tree
 
-import           Prelude (Num(..), Integral, div)
-
-import qualified Test.QuickCheck.Arbitrary as QC
+import           Prelude (Num(..), Integral, quot)
 
 
--- | Shrink an integral, but don't allow it to go below the specified minimum.
-shrinkIntegral :: Integral a => a -> a -> [a]
-shrinkIntegral x_min x =
-  fmap (+ x_min) $ QC.shrinkIntegral (x - x_min)
+-- | Shrink an integral by edging towards a destination number.
+shrinkTowards :: Integral a => a -> a -> [a]
+shrinkTowards destination x =
+  if destination == x then
+    []
+  else
+    let
+      -- We need to halve our operands before subtracting them as they may be using
+      -- the full range of the type (i.e. 'minBound' and 'maxBound' for 'Int32')
+      diff =
+        (x `quot` 2) - (destination `quot` 2)
+    in
+      -- We make up for halving the inputs by explicitly prepending the
+      -- destination as the first element of the list.
+      destination `consNub` fmap (x -) (halves diff)
+
+consNub :: Eq a => a -> [a] -> [a]
+consNub x = \case
+  [] ->
+    x : []
+  y : ys ->
+    if x == y then
+      y : ys
+    else
+      x : y : ys
 
 -- | Turn a list of trees in to a tree of lists, opting to shrink only the
 --   elements of the list (i.e. the size of the list will always be the same).
@@ -80,11 +100,12 @@ shrinkList xs = do
 --
 --   > halves 30 == [30,15,7,3,1]
 --   > halves 128 == [128,64,32,16,8,4,2,1]
+--   > halves (-10) == [-10,-5,-2,-1]
 --
-halves :: Int -> [Int]
+halves :: Integral a => a -> [a]
 halves =
-  List.takeWhile (> 0) .
-  List.iterate (`div` 2)
+  List.takeWhile (/= 0) .
+  List.iterate (`quot` 2)
 
 -- | Permutes a list by removing 'k' consecutive elements from it:
 --

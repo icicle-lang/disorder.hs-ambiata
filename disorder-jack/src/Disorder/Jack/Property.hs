@@ -10,16 +10,48 @@ module Disorder.Jack.Property (
   , sample
   , sampleTree
   , printSample
+  , printSampleTree
 
-  -- * QuickCheck re-exports
+  , (===)
+
+  -- * "Test.QuickCheck" re-exports
+
+  -- ** "Test.QuickCheck.Property"
   , Property(..)
   , Testable(..)
+  , counterexample
+  , failed
+  , succeeded
+  , rejected
+  , (==>)
+  , (.&&.)
+  , (.||.)
+  , conjoin
+  , disjoin
+  , once
+
+  -- ** "Test.QuickCheck.Exception"
+  , discard
+
+  -- ** "Test.QuickCheck.Test"
+  , Args(..)
+  , stdArgs
+  , quickCheck
+  , quickCheckWithResult
+  , verboseCheckWithResult
+
+  -- ** "Test.QuickCheck.All"
+  , quickCheckAll
+  , verboseCheckAll
+  , forAllProperties
   ) where
 
+import           Data.Eq (Eq(..))
 import           Data.Foldable (for_, traverse_)
 import           Data.Function (($), (.))
 import           Data.Functor (Functor(..))
 import qualified Data.List as List
+import           Data.Monoid ((<>))
 import           Data.String (String)
 import           Data.Text (Text)
 import qualified Data.Text as T
@@ -33,30 +65,37 @@ import           Text.Show (Show)
 import           Text.Show.Pretty (ppShow)
 
 import qualified Test.QuickCheck as QC
+import           Test.QuickCheck.All (quickCheckAll, verboseCheckAll, forAllProperties)
+import           Test.QuickCheck.Exception (discard)
 import           Test.QuickCheck.Gen.Unsafe (promote)
+import           Test.QuickCheck.Property ((==>), (.&&.), (.||.))
 import           Test.QuickCheck.Property (Testable(..), Property(..), Prop(..), Rose(..))
-import           Test.QuickCheck.Property (joinRose)
+import           Test.QuickCheck.Property (conjoin, disjoin, once)
+import           Test.QuickCheck.Property (joinRose, counterexample)
+import           Test.QuickCheck.Property (succeeded, failed, rejected)
+import           Test.QuickCheck.Test (Args(..), stdArgs)
+import           Test.QuickCheck.Test (quickCheck, quickCheckWithResult, verboseCheckWithResult)
 
 
 -- | Ask 'Jack' to generate test cases to exercise the given property.
 gamble :: (Show a, Testable prop) => Jack a -> (a -> prop) -> Property
-gamble jack =
-  gambleDisplay jack ppShow
+gamble =
+  gambleDisplay ppShow
 
 -- | Ask 'Jack' to generate test cases, but provide a custom render function
 --   for displaying counterexampes.
-gambleRender :: Testable prop => Jack a -> (a -> Text) -> (a -> prop) -> Property
-gambleRender jack render =
-  gambleDisplay jack (T.unpack . render)
+gambleRender :: Testable prop => (a -> Text) -> Jack a -> (a -> prop) -> Property
+gambleRender render =
+  gambleDisplay (T.unpack . render)
 
 -- | Ask 'Jack' to generate test cases, but provide a custom render function
 --   for displaying counterexampes.
-gambleDisplay :: Testable prop => Jack a -> (a -> String) -> (a -> prop) -> Property
-gambleDisplay jack render pf =
+gambleDisplay :: Testable prop => (a -> String) -> Jack a -> (a -> prop) -> Property
+gambleDisplay render jack pf =
   MkProperty $ do
     tree <- runJack jack
     unProperty . shrinking tree $ \x ->
-      QC.counterexample (render x) $
+      counterexample (render x) $
       pf x
 
 -- | Use an existing 'Tree' to exercise a given property.
@@ -92,3 +131,15 @@ printSample jack = do
     putStrLn "=== Shrinks ==="
     traverse_ (putStrLn . ppShow . outcome) $ shrinks tree
     putStrLn ""
+
+printSampleTree :: Show a => Jack a -> IO ()
+printSampleTree jack = do
+  forest <- fmap (List.take 1) $ sampleTree jack
+  for_ forest $ \tree -> do
+    putStrLn $ ppShow tree
+
+infix 4 ===
+
+(===) :: (Eq a, Show a) => a -> a -> Property
+(===) x y =
+  counterexample (ppShow x <> " /= " <> ppShow y) (x == y)
