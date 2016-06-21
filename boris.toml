@@ -5,6 +5,7 @@
   command = [
       ["master", "build", "dist-7-8", "-C", "disorder-core"]
     , ["master", "build", "dist-7-8", "-C", "disorder-corpus"]
+    , ["master", "build", "dist-7-8", "-C", "disorder-jack"]
     , ["master", "build", "dist-7-8", "-C", "disorder-cli"]
     , ["master", "build", "dist-7-8", "-C", "disorder-aeson"]
     , ["master", "build", "dist-7-8", "-C", "disorder-eithert"]
@@ -16,6 +17,7 @@
   command = [
       ["master", "build", "dist-7-10", "-C", "disorder-core"]
     , ["master", "build", "dist-7-10", "-C", "disorder-corpus"]
+    , ["master", "build", "dist-7-10", "-C", "disorder-jack"]
     , ["master", "build", "dist-7-10", "-C", "disorder-cli"]
     , ["master", "build", "dist-7-10", "-C", "disorder-aeson"]
     , ["master", "build", "dist-7-10", "-C", "disorder-eithert"]
@@ -27,6 +29,7 @@
   command = [
       ["master", "build", "dist-8-0", "-C", "disorder-core"]
     , ["master", "build", "dist-8-0", "-C", "disorder-corpus"]
+    , ["master", "build", "dist-8-0", "-C", "disorder-jack"]
     , ["master", "build", "dist-8-0", "-C", "disorder-cli"]
     , ["master", "build", "dist-8-0", "-C", "disorder-aeson"]
     , ["master", "build", "dist-8-0", "-C", "disorder-eithert"]
@@ -38,6 +41,7 @@
   command = [
       ["master", "build", "branches-7-8", "-C", "disorder-core"]
     , ["master", "build", "branches-7-8", "-C", "disorder-corpus"]
+    , ["master", "build", "branches-7-8", "-C", "disorder-jack"]
     , ["master", "build", "branches-7-8", "-C", "disorder-cli"]
     , ["master", "build", "branches-7-8", "-C", "disorder-aeson"]
     , ["master", "build", "branches-7-8", "-C", "disorder-eithert"]
@@ -49,6 +53,7 @@
   command = [
       ["master", "build", "branches-7-10", "-C", "disorder-core"]
     , ["master", "build", "branches-7-10", "-C", "disorder-corpus"]
+    , ["master", "build", "branches-7-10", "-C", "disorder-jack"]
     , ["master", "build", "branches-7-10", "-C", "disorder-cli"]
     , ["master", "build", "branches-7-10", "-C", "disorder-aeson"]
     , ["master", "build", "branches-7-10", "-C", "disorder-eithert"]
@@ -60,6 +65,7 @@
   command = [
       ["master", "build", "branches-8-0", "-C", "disorder-core"]
     , ["master", "build", "branches-8-0", "-C", "disorder-corpus"]
+    , ["master", "build", "branches-8-0", "-C", "disorder-jack"]
     , ["master", "build", "branches-8-0", "-C", "disorder-cli"]
     , ["master", "build", "branches-8-0", "-C", "disorder-aeson"]
     , ["master", "build", "branches-8-0", "-C", "disorder-eithert"]
