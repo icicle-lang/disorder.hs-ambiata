@@ -10,6 +10,7 @@ module Disorder.Jack.Combinators (
   , variant
   , sized
   , resize
+  , scale
 
   -- * Sized Generators
   , sizedInt
@@ -29,7 +30,8 @@ module Disorder.Jack.Combinators (
   , chooseChar
 
   -- * List Combinators
-  , oneof
+  , oneOf
+  , oneOfRec
   , frequency
   , elements
   , sublistOf
@@ -40,6 +42,7 @@ module Disorder.Jack.Combinators (
   , vectorOf
 
   -- * Uncertainty Combinators
+  , maybeOf
   , justOf
   , suchThat
   , suchThatMaybe
@@ -68,7 +71,7 @@ import           Disorder.Jack.Core
 import           Disorder.Jack.Shrink
 import           Disorder.Jack.Tree
 
-import           Prelude (Num(..), Bounded(..), Enum(..), Integral)
+import           Prelude (Num(..), Bounded(..), Enum(..), Integral, div)
 import qualified Prelude as Savage
 
 import           System.Random (Random)
@@ -100,6 +103,12 @@ resize n =
     Savage.error "Disorder.Jack.Combinators.resize: negative size"
   else
     mapGen $ QC.resize n
+
+-- | Update the current size by mapping a function over it.
+scale :: (Int -> Int) -> Jack a -> Jack a
+scale f j =
+  sized $ \n ->
+    resize (f n) j
 
 -- | Generates an 'Int'. The number can be positive or negative and its maximum
 --   absolute value depends on the size parameter.
@@ -177,13 +186,26 @@ chooseChar (b0, b1) =
 
 -- | Randomly selects one of the jacks in the list.
 --   /The input list must be non-empty./
-oneof :: [Jack a] -> Jack a
-oneof = \case
+oneOf :: [Jack a] -> Jack a
+oneOf = \case
   [] ->
-    Savage.error "Disorder.Jack.Combinators.oneof: used with empty list"
+    Savage.error "Disorder.Jack.Combinators.oneOf: used with empty list"
   xs -> do
     n <- choose (0, List.length xs - 1)
     xs List.!! n
+
+-- | Randomly selects from one of the jacks in either the non-recursive or the
+--   recursive list. When a selection is made from the recursive list, the size
+--   is halved. When the size gets to one or less, selections are no longer made
+--   from the recursive list.
+--   /The first argument (i.e. the non-recursive input list) must be non-empty./
+oneOfRec :: [Jack a] -> [Jack a] -> Jack a
+oneOfRec nonrec rec =
+  sized $ \n ->
+    if n <= 1 then
+      oneOf nonrec
+    else
+      oneOf $ nonrec <> fmap (scale (`div` 2)) rec
 
 -- | Uses a weighted distribution to randomly select one of the jacks in the list.
 --   /The input list must be non-empty./
@@ -291,6 +313,15 @@ listOfN n m (Jack gen) =
 vectorOf :: Int -> Jack a -> Jack [a]
 vectorOf n =
   mapGen (fmap sequenceShrinkOne . replicateM n)
+
+-- | Generates a 'Nothing' some of the time.
+maybeOf :: Jack a -> Jack (Maybe a)
+maybeOf jack =
+  sized $ \n ->
+    frequency [
+        (1, pure Nothing)
+      , (n, Just <$> jack)
+      ]
 
 -- | Runs a generator that produces 'Maybe a' until it produces a 'Just'.
 justOf :: Jack (Maybe a) -> Jack a

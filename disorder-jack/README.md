@@ -42,26 +42,12 @@ data Exp =
   | App !Exp !Exp
     deriving (Eq, Ord, Show)
 
-exp :: Int -> Jack Exp
-exp n =
+exp :: Jack Exp
+exp =
   let
-    text :: Jack Text
     text =
       T.pack <$> arbitrary
 
-    exp0 :: Jack Exp
-    exp0 = [
-        Con <$> sizedIntegral
-      , Var <$> text
-      ]
-
-    expN :: Jack Exp
-    expN = [
-        Lam <$> text <*> exp (n-1)
-      , App <$> exp (n-1) <*> exp (n-1)
-      ]
-
-    shrink :: Exp -> [Exp]
     shrink = \case
       Lam _ x ->
         [x]
@@ -71,7 +57,13 @@ exp n =
         []
   in
     reshrink shrink $
-      oneof (exp0 <> if n > 0 then expN else [])
+      oneOfRec [
+          Con <$> sizedIntegral
+        , Var <$> text
+        ] [
+          Lam <$> text <*> exp
+        , App <$> exp <*> exp
+        ]
 ```
 
 ## Properties

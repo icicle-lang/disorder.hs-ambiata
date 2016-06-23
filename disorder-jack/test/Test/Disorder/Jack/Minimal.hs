@@ -14,8 +14,6 @@ import           Data.Functor (Functor(..), (<$>))
 import           Data.Int (Int)
 import qualified Data.List as List
 import           Data.Maybe (Maybe(..))
-import           Data.Monoid ((<>))
-import           Data.Ord (Ord(..))
 import           Data.Text (Text)
 import qualified Data.Text as T
 
@@ -23,8 +21,6 @@ import           Disorder.Jack.Combinators
 import           Disorder.Jack.Core
 import           Disorder.Jack.Property
 import           Disorder.Jack.Tree
-
-import           Prelude (Num(..))
 
 import           System.IO (IO)
 
@@ -39,21 +35,11 @@ data Exp =
   | App !Exp !Exp
     deriving (Show)
 
-exp :: Int -> Jack Exp
-exp n =
+exp :: Jack Exp
+exp =
   let
     text =
       T.pack <$> arbitrary
-
-    exp0 = [
-        Con <$> sizedIntegral
-      , Var <$> text
-      ]
-
-    expN = [
-        Lam <$> text <*> exp (n-1)
-      , App <$> exp (n-1) <*> exp (n-1)
-      ]
 
     shrink = \case
       Lam _ x ->
@@ -64,7 +50,13 @@ exp n =
         []
   in
     reshrink shrink $
-      oneof (exp0 <> if n > 0 then expN else [])
+      oneOfRec [
+          Con <$> sizedIntegral
+        , Var <$> text
+        ] [
+          Lam <$> text <*> exp
+        , App <$> exp <*> exp
+        ]
 
 noAppCon10 :: Exp -> Bool
 noAppCon10 = \case
@@ -88,7 +80,7 @@ smallestFailure f (Node x xs) =
 
 prop_listOf_minimal :: Property
 prop_listOf_minimal =
-  gamble (mapTree duplicate . listOf $ sized exp) $ \xs ->
+  gamble (mapTree duplicate $ listOf exp) $ \xs ->
     case smallestFailure (List.all noAppCon10) xs of
       Nothing ->
         property succeeded
