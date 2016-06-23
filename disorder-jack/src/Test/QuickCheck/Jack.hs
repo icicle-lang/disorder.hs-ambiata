@@ -4,10 +4,17 @@ module Test.QuickCheck.Jack (
     Gen
   , forAll
   , arbitraryBoundedEnum
+  , oneof
+  , listOf1
   , module X
   ) where
 
-import           Disorder.Jack as X
+import qualified Disorder.Jack as Jack
+import           Disorder.Jack as X hiding (listOf1)
+
+import           Data.Function ((.))
+import           Data.Functor (fmap)
+import           Data.Foldable (toList)
 
 import           Prelude (Bounded, Enum)
 
@@ -26,3 +33,11 @@ forAll =
 arbitraryBoundedEnum :: (Bounded a, Enum a) => Jack a
 arbitraryBoundedEnum =
   boundedEnum
+
+oneof :: [Jack a] -> Jack a
+oneof =
+  oneOf
+
+listOf1 :: Jack a -> Jack [a]
+listOf1 =
+  fmap toList . Jack.listOf1

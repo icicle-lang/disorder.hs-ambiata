@@ -55,7 +55,7 @@ prop_choose =
 
 prop_oneof :: Property
 prop_oneof =
-  gamble (mapTree duplicate $ oneof [pure 'A', pure 'B', pure 'C']) isABC
+  gamble (mapTree duplicate $ oneOf [pure 'A', pure 'B', pure 'C']) isABC
 
 prop_elements :: Property
 prop_elements =
