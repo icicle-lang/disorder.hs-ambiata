@@ -40,6 +40,7 @@ library
                        Disorder.Jack.Property
                        Disorder.Jack.Shrink
                        Disorder.Jack.Tree
+                       Disorder.Jack.Tripping
 
                        Test.QuickCheck.Jack
 
