@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE PatternGuards #-}
 module Disorder.Jack.Property (
     gamble
   , gambleRender
@@ -58,11 +59,13 @@ import qualified Data.Text as T
 
 import           Disorder.Jack.Core
 import           Disorder.Jack.Tree
-
+import           Disorder.Jack.Property.Diff
 import           System.IO (IO, putStrLn)
 
 import           Text.Show (Show)
 import           Text.Show.Pretty (ppShow)
+import qualified Text.Show.Pretty as Pretty
+import           Prelude (Bool(..), Maybe(..))
 
 import qualified Test.QuickCheck as QC
 import           Test.QuickCheck.All (quickCheckAll, verboseCheckAll, forAllProperties)
@@ -142,4 +145,12 @@ infix 4 ===
 
 (===) :: (Eq a, Show a) => a -> a -> Property
 (===) x y =
-  counterexample (ppShow x <> " /= " <> ppShow y) (x == y)
+  counterexample "=== Not equal ===" $
+  counterexample render (x == y)
+  where
+    render
+     | Just x' <- Pretty.reify x
+     , Just y' <- Pretty.reify y
+     = renderDiffs x' y'
+     | True
+     = ppShow x <> " /= " <> ppShow y

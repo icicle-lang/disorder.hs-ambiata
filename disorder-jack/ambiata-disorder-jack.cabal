@@ -38,6 +38,7 @@ library
                        Disorder.Jack.Combinators
                        Disorder.Jack.Core
                        Disorder.Jack.Property
+                       Disorder.Jack.Property.Diff
                        Disorder.Jack.Shrink
                        Disorder.Jack.Tree
                        Disorder.Jack.Tripping
