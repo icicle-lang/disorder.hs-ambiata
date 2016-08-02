@@ -157,7 +157,7 @@ infix 4 ===
 
 -- | Attempt to render difference between two MaxML values
 renderDiffs :: Pretty.Value -> Pretty.Value -> String
-renderDiffs val1 val2 = go 0 val1 val2
+renderDiffs val1 val2 = prints $ go 0 val1 val2
  where
   go i a b = case (a, b) of
     _
@@ -182,7 +182,7 @@ renderDiffs val1 val2 = go 0 val1 val2
      , fmap (\(u,_) -> u) us == fmap (\(v,_) -> v) vs
      -> same i n
      -- Print field name too
-     <> goes (\i' (ix,u) (_,v) -> same (i'-1) (ix <> " = ") <> go i' u v) "{" "," "}" i (List.zip us vs)
+     <> goes (\i' (ix,u) (_,v) -> same i' (ix <> " = ") <> go i' u v) "{" "," "}" i (List.zip us vs)
 
     -- Tuples and lists of same length
     (Pretty.Tuple us, Pretty.Tuple vs)
@@ -204,13 +204,9 @@ renderDiffs val1 val2 = go 0 val1 val2
   -- Print value on right side
   rr i v = sho "+" i (Pretty.valToStr v)
 
-  -- Actually print something
-  sho pre i val
-   = let tabs = List.replicate (i * 2) ' '
-         -- Add the prefix '+' or '-' as well as indentation to each line
-         lns  = List.lines val
-         lns' = fmap (\a -> pre <> tabs <> a) lns
-     in  List.unlines lns'
+  -- Split up multi-line things into same indentation level.
+  -- Any indentation in the string itself will still be there as spaces.
+  sho pre i val = fmap (\a -> (pre,i,a)) $ List.lines val
 
   goes gg l m r i uvs
    = same i l <> goes' False gg m i uvs <> same i r
@@ -223,3 +219,33 @@ renderDiffs val1 val2 = go 0 val1 val2
   goes' _ _ _ _ []
    = []
 
+  -- Layout / printing part
+  prints [] = []
+  -- Squash two lines together.
+  -- If the next line is indented more, we might be able to squeeze them onto a single line.
+  -- This looks a bit nicer.
+  -- For example,
+  -- "    ,"
+  -- "       Foo"
+  -- can be condensed onto a single line:
+  -- "    ,  Foo"
+  --
+  prints ((p1,i1,v1):(p2,i2,v2):fs)
+   -- Only if their '+' or '-' prefix are the same
+   | p1 == p2
+   -- Get end of first line
+   , end1   <- i1 * tabSize + List.length v1
+   -- And start of next line
+   , start2 <- i2 * tabSize
+   -- Check end fits before start
+   , end1 < start2
+   -- Now add extra padding that we lost by condensing, to get to second line's indentation level
+   = let diff = start2 - end1
+     in  prints ((p1,i1,v1 <> List.replicate diff ' ' <> v2) : fs)
+
+  -- Indent and append all the bits together
+  prints ((p,i,v):fs)
+   = let tabs = List.replicate (i * tabSize) ' '
+     in  p <> tabs <> v <> "\n" <> prints fs
+
+  tabSize = 2
