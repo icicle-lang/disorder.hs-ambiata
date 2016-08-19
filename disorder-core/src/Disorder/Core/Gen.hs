@@ -17,6 +17,8 @@ module Disorder.Core.Gen (
   , vectorOfUniqueBy
   , vectorOfUniqueBy'
   , listOf1Unique
+  , genNonEmpty
+  , genNonEmptyUnique
 
   -- * re-exports from quickcheck-text
   , genValidUtf8
@@ -31,6 +33,8 @@ module Disorder.Core.Gen (
 
 import           Control.Applicative
 
+import           Data.List.NonEmpty (NonEmpty (..))
+import qualified Data.List.NonEmpty as N
 import           Data.Maybe (isJust)
 import           Data.Monoid ((<>))
 
@@ -183,8 +187,14 @@ vectorOfUnique = vectorOfUnique' 30
 
 -- | Generates a non-empty list of random length with no duplicate values.
 -- The maximum length depends on the size parameter.
---
--- This generator is not guaranteed to terminate successfully; see
--- 'vectorOfUnique'' for details.
 listOf1Unique :: Eq a => Gen a -> Gen [a]
-listOf1Unique g = sized $ \s -> choose (1, max 1 s) >>= (flip vectorOfUnique g)
+listOf1Unique g =
+  N.toList <$> genNonEmptyUnique g
+
+genNonEmpty :: Gen a -> Gen (NonEmpty a)
+genNonEmpty g =
+  (:|) <$> g <*> listOf g
+
+genNonEmptyUnique :: Eq a => Gen a -> Gen (NonEmpty a)
+genNonEmptyUnique g =
+  N.nub <$> genNonEmpty g
