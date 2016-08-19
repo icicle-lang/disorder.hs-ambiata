@@ -1,6 +1,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Test.Disorder.Core.Gen where
 
+import           Data.List (nub)
+
 import           Disorder.Core.Gen
 import           Disorder.Core.IO
 import           Disorder.Core.OrdPair
@@ -36,6 +38,26 @@ prop_genFromMaybe =
   testIO $ do
     ma <- generate $ genFromMaybe (arbitrary :: Gen (Maybe ()))
     return $ ma == ()
+
+prop_vectorOfUnique :: Property
+prop_vectorOfUnique =
+  forAll (choose (0, 100)) $ \n ->
+    forAll (vectorOfUnique n genValidUtf8) $ \xs ->
+      (xs, length xs) === (nub xs, n)
+
+prop_vectorOfUnique' :: Property
+prop_vectorOfUnique' =
+  expectFailure $
+    forAll (vectorOfUnique' 0 10 genValidUtf8) $ \xs ->
+      xs === nub xs
+
+prop_listOf1Unique :: Property
+prop_listOf1Unique =
+  forAll (listOf1Unique genValidUtf8) $ \xs ->
+    conjoin [
+        xs === nub xs
+      , (length xs >= 1) === True
+      ]
 
 return []
 tests :: IO Bool

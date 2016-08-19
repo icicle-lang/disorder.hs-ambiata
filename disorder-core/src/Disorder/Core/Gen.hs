@@ -12,6 +12,11 @@ module Disorder.Core.Gen (
   , oneofSized
   , smaller
   , vectorOfSize
+  , vectorOfUnique
+  , vectorOfUnique'
+  , vectorOfUniqueBy
+  , vectorOfUniqueBy'
+  , listOf1Unique
 
   -- * re-exports from quickcheck-text
   , genValidUtf8
@@ -27,6 +32,7 @@ module Disorder.Core.Gen (
 import           Control.Applicative
 
 import           Data.Maybe (isJust)
+import           Data.Monoid ((<>))
 
 import           Test.QuickCheck.Gen
 import           Test.QuickCheck.Random
@@ -123,3 +129,62 @@ genDeterministic' :: Int -> GenSeed -> Gen a -> a
 genDeterministic' size (GenSeed seed) (MkGen g) =
   let r = mkQCGen seed in
   g r size
+
+-- | Generate a list of a given length containing no duplicates (by the
+-- provided comparison function). This is 'vectorOfUnique'' parameterised by
+-- equality operator; the same caveats apply, including partiality.
+vectorOfUniqueBy' :: (a -> a -> Bool) -> Int -> Int -> Gen a -> Gen [a]
+vectorOfUniqueBy' cmp s k g =
+  scaled (max s) $ go k [] mana
+  where
+    go 0 xs _ = pure xs
+    go _ xs 0 =
+      fail $ "vectorOfUniqueBy' out of mana - are you trying to generate a list larger than the cardinality of the type? (" <> show (length xs) <> "/" <> show k <> ")"
+    go n xs mana' =
+      g >>= \y -> case any (cmp y) xs of
+        True -> go n xs $ mana' - 1
+        False -> go (n - 1) (y : xs) mana
+
+    mana :: Int
+    mana = 10000
+
+    -- scale is in QuickCheck 2.8
+    scaled f h = sized $ \x -> resize (f x) h
+
+-- | Generate a list of a given length containing no duplicates (by the
+-- provided comparison function). This is 'vectorOfUnique' parameterised by
+-- equality operator; the same caveats apply, including partiality.
+vectorOfUniqueBy :: (a -> a -> Bool) -> Int -> Gen a -> Gen [a]
+vectorOfUniqueBy cmp = vectorOfUniqueBy' cmp 30
+
+-- | Generate a list of a given length containing no duplicates.
+--
+-- As the provided length can be greater than the cardinality of the type
+-- (number of distinct representable values), this function is not guaranteed
+-- to terminate successfully; it will give up after 10000 consecutive failures
+-- to generate a new value.
+--
+-- `vectorOfUnique' n` runs the generator with a size equal to the maximum of
+-- `n` and the current size parameter; setting this above zero is necessary to
+-- use this with sized generators from the QuickCheck test runner. The optimal
+-- value depends on the cardinality of the type, how the generator in question
+-- uses the size parameter, and the desired number of unique values.
+vectorOfUnique' :: Eq a => Int -> Int -> Gen a -> Gen [a]
+vectorOfUnique' = vectorOfUniqueBy' (==)
+
+-- | Generate a list of a given length containing no duplicates. This is
+-- 'vectorOfUnique'' with a minimum generator size of 30, which is sufficient
+-- for most common sized generators.
+--
+-- This generator is not guaranteed to terminate successfully; see
+-- 'vectorOfUnique'' for details.
+vectorOfUnique :: Eq a => Int -> Gen a -> Gen [a]
+vectorOfUnique = vectorOfUnique' 30
+
+-- | Generates a non-empty list of random length with no duplicate values.
+-- The maximum length depends on the size parameter.
+--
+-- This generator is not guaranteed to terminate successfully; see
+-- 'vectorOfUnique'' for details.
+listOf1Unique :: Eq a => Gen a -> Gen [a]
+listOf1Unique g = sized $ \s -> choose (1, max 1 s) >>= (flip vectorOfUnique g)
