@@ -187,12 +187,9 @@ vectorOfUnique = vectorOfUnique' 30
 
 -- | Generates a non-empty list of random length with no duplicate values.
 -- The maximum length depends on the size parameter.
---
--- This generator is not guaranteed to terminate successfully; see
--- 'vectorOfUnique'' for details.
 listOf1Unique :: Eq a => Gen a -> Gen [a]
-listOf1Unique g = sized $ \s -> choose (1, max 1 s) >>= (flip vectorOfUnique g)
-
+listOf1Unique g =
+  N.toList <$> genNonEmptyUnique g
 
 genNonEmpty :: Gen a -> Gen (NonEmpty a)
 genNonEmpty g =
