@@ -320,7 +320,7 @@ maybeOf jack =
   sized $ \n ->
     frequency [
         (1, pure Nothing)
-      , (n, Just <$> jack)
+      , (1 + n, Just <$> jack)
       ]
 
 -- | Runs a generator that produces 'Maybe a' until it produces a 'Just'.
