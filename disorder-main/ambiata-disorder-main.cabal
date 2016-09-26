@@ -1,0 +1,35 @@
+name:                  ambiata-disorder-main
+version:               0.0.1
+license:               AllRightsReserved
+author:                Ambiata <info@ambiata.com>
+maintainer:            Ambiata <info@ambiata.com>
+copyright:             (c) 2016 Ambiata
+synopsis:              disorder-main
+category:              System
+cabal-version:         >= 1.8
+build-type:            Simple
+description:           disorder-main.
+
+library
+  build-depends:
+                       base                            >= 3          && < 5
+                     , QuickCheck                      >= 2.7        && < 2.9
+                     , async                           >= 2.1        && < 3
+                     , process                         >= 1.2        && < 1.5
+                     , semigroups                      >= 0.16       && < 0.19
+                     , text                            >= 1.1        && < 1.3
+                     , transformers                    >= 0.3        && < 1
+
+  ghc-options:         -Wall
+  if impl(ghc >= 8.0)
+    ghc-options:       -fno-warn-redundant-constraints
+
+
+  hs-source-dirs:
+                       src
+
+
+  exposed-modules:
+                       Paths_ambiata_disorder_main
+                       Disorder.Main
+
