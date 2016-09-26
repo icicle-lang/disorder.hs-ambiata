@@ -4,6 +4,7 @@ module Disorder.Core.Main (
   ) where
 
 import           Control.Applicative
+import           Control.Concurrent.Async
 import           Control.Monad
 
 import           System.Directory
@@ -13,9 +14,12 @@ import           System.IO
 
 import           Prelude
 
+sequenceConcurrently :: Traversable t => t (IO a) -> IO (t a)
+sequenceConcurrently = runConcurrently . sequenceA . fmap Concurrently
+
 disorderMain :: [IO Bool] -> IO ()
 disorderMain tests =
-  sanity >> sequence tests >>= \rs -> unless (and rs) exitFailure
+  sanity >> sequenceConcurrently tests >>= \rs -> unless (and rs) exitFailure
 
 disorderCliMain :: [String] -> IO ()
 disorderCliMain arguments =
