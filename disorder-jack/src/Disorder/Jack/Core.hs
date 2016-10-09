@@ -12,15 +12,18 @@ module Disorder.Jack.Core (
   ) where
 
 import           Control.Applicative (Applicative(..), liftA2)
-import           Control.Monad (Monad(..), join)
+import           Control.Monad (Monad(..))
 
 import           Data.Function (($), (.), const, flip, id)
 import           Data.Functor (Functor(..))
-import           Data.Traversable (traverse)
 
 import           Disorder.Jack.Tree
 
+import           System.Random (split)
+
 import           Test.QuickCheck (Gen)
+import qualified Test.QuickCheck.Gen as QC
+import           Test.QuickCheck.Random (QCGen)
 
 
 -- | Jack's love of dice has brought him here, where he has taken on the form
@@ -48,11 +51,24 @@ instance Monad Jack where
     pure
 
   (>>=) m0 k0 =
+    Jack $ bindGenTree (runJack m0) (runJack . k0)
+
+-- | Used to implement '(>>=)' for 'Jack'.
+bindGenTree :: Gen (Tree a) -> (a -> Gen (Tree b)) -> Gen (Tree b)
+bindGenTree m k =
+  -- It's important to note that we don't use 'traverse' here, we explicitly
+  -- only split the seed once, this ensures we get the same behaviour for our
+  -- Monad and Applicative instances.
+  QC.MkGen $ \seed0 size ->
     let
-      go m k =
-        m >>= fmap join . traverse k
+      (seed1, seed2) =
+        split seed0
+
+      runGen :: QCGen -> Gen x -> x
+      runGen seed gen =
+        QC.unGen gen seed size
     in
-      Jack $ go (runJack m0) (runJack . k0)
+      runGen seed1 m >>= runGen seed2 . k
 
 -- | Create a 'Jack' from a shrink function and a 'Gen'.
 mkJack :: (a -> [a]) -> Gen a -> Jack a

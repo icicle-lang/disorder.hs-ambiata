@@ -95,7 +95,7 @@ prop_shuffle =
 
 prop_listOf1 :: Property
 prop_listOf1 =
-  gamble (mapTree duplicate . listOf1 $ pure "x") $
+  gamble (mapTree duplicate . listOf1 $ pure ("x" :: [Char])) $
     -- This might seem silly, but we're really just testing that the "internal
     -- error" case doesn't come up.
     List.all (\xs -> NonEmpty.length xs > 0) . List.take 1000 . Foldable.toList
@@ -103,7 +103,7 @@ prop_listOf1 =
 prop_vectorOf :: Property
 prop_vectorOf =
   gamble (choose (0, 1000)) $ \n ->
-  gamble (mapTree duplicate . vectorOf n $ pure "x") $
+  gamble (mapTree duplicate . vectorOf n $ pure ("x" :: [Char])) $
     Foldable.all (\xs -> n == List.length xs)
 
 prop_suchThat :: Property
