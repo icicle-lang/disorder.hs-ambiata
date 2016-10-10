@@ -18,6 +18,7 @@ module Disorder.Jack.Combinators (
   , sizedNat
   , sizedNatural
   , sizedBounded
+  , sizedRealFrac
 
   -- * Bounded Generators
   , bounded
@@ -71,7 +72,7 @@ import           Disorder.Jack.Core
 import           Disorder.Jack.Shrink
 import           Disorder.Jack.Tree
 
-import           Prelude (Num(..), Bounded(..), Enum(..), Integral, div)
+import           Prelude (Num(..), Bounded(..), Enum(..), Integral, div, RealFrac)
 import qualified Prelude as Savage
 
 import           System.Random (Random)
@@ -121,6 +122,12 @@ sizedInt =
 sizedIntegral :: Integral a => Jack a
 sizedIntegral =
   mkJack QC.shrinkIntegral QC.arbitrarySizedIntegral
+
+-- | Generates a fractional number. The number can be positive or negative and
+--   its maximum absolute value depends on the size parameter.
+sizedRealFrac :: RealFrac a => Jack a
+sizedRealFrac =
+  mkJack QC.shrinkRealFrac QC.arbitrarySizedFractional
 
 -- | Generates a non-negative 'Int'. The number's maximum value depends on the
 --   size parameter.
