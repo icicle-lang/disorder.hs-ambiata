@@ -58,6 +58,7 @@ import           Data.Bool (Bool(..), not)
 import           Data.Char (Char, ord, chr)
 import           Data.Function (($), (.), id)
 import           Data.Functor (Functor(..), (<$>))
+import           Data.Foldable (Foldable(..), toList)
 import           Data.Int (Int)
 import qualified Data.List as List
 import           Data.List.NonEmpty (NonEmpty(..))
@@ -232,13 +233,14 @@ frequency = \case
 
 -- | Randomly selects one of the values in the list.
 --   /The input list must be non-empty./
-elements :: [a] -> Jack a
-elements = \case
-  [] ->
-    Savage.error "Disorder.Jack.Combinators.elements: used with empty list"
-  xs -> do
-    n <- choose (0, List.length xs - 1)
-    pure $ xs List.!! n
+elements :: Foldable b => b a -> Jack a
+elements xs =
+  case toList xs of
+    [] ->
+      Savage.error "Disorder.Jack.Combinators.elements: used with empty foldable"
+    ys -> do
+      n <- choose (0, List.length ys - 1)
+      pure $ ys List.!! n
 
 -- | Generates a random subsequence of the given list.
 sublistOf :: [a] -> Jack [a]
