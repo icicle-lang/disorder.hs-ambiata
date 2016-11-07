@@ -1,21 +1,34 @@
 module Disorder.Core.IO (
-    testIO
+    testM
+  , testPropertyM
+  , testIO
   , testPropertyIO
   , withCPUTime
   ) where
 
-import           Control.Monad.IO.Class (liftIO, MonadIO)
+import           Control.Monad.IO.Class (MonadIO(..))
 
-import           Test.QuickCheck
-import           Test.QuickCheck.Monadic
+import           Test.QuickCheck (Testable, Property, ioProperty)
+import           Test.QuickCheck.Monadic (PropertyM, monadic, run, stop)
 
 import           System.CPUTime (getCPUTime)
 
+
+testM :: (Monad m, Testable a) => (m Property -> Property) -> m a -> Property
+testM prop =
+  testPropertyM prop . run
+
+testPropertyM :: (Monad m, Testable a) => (m Property -> Property) -> PropertyM m a -> Property
+testPropertyM prop =
+  monadic prop . (=<<) stop
+
 testIO :: Testable a => IO a -> Property
-testIO = testPropertyIO . run
+testIO =
+  testM ioProperty
 
 testPropertyIO :: Testable a => PropertyM IO a -> Property
-testPropertyIO = monadicIO . (=<<) stop
+testPropertyIO =
+  testPropertyM ioProperty
 
 -- | Perform an action and return the CPU time it takes, in picoseconds
 -- (actual precision varies with implementation).
