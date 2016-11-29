@@ -44,6 +44,7 @@ library
                        Disorder.Core.Tripping
                        Disorder.Core.UniquePair
                        Disorder.Core.QuickCheck
+                       Disorder.Core.Combinators
 
 test-suite test
   type:                exitcode-stdio-1.0

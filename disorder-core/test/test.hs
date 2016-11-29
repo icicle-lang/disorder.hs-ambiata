@@ -5,6 +5,7 @@ import qualified Test.Disorder.Core.Tripping
 import qualified Test.Disorder.Core.UniquePair
 import qualified Test.Disorder.Core.OrdPair
 import qualified Test.Disorder.Core.IO
+import qualified Test.Disorder.Core.Combinators
 
 main :: IO ()
 main = disorderMain [
@@ -14,4 +15,5 @@ main = disorderMain [
   , Test.Disorder.Core.UniquePair.tests
   , Test.Disorder.Core.OrdPair.tests
   , Test.Disorder.Core.IO.tests
+  , Test.Disorder.Core.Combinators.tests
   ]
