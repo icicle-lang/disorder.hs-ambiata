@@ -8,3 +8,4 @@ import           Disorder.Core.Property as X
 import           Disorder.Core.Run as X
 import           Disorder.Core.Tripping as X
 import           Disorder.Core.UniquePair as X
+import           Disorder.Core.Combinators as X
