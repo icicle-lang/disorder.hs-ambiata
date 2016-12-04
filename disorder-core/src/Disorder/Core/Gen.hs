@@ -17,6 +17,7 @@ module Disorder.Core.Gen (
   , vectorOfUniqueBy
   , vectorOfUniqueBy'
   , listOf1Unique
+  , listOf1UniquePair
   , genNonEmpty
   , genNonEmptyUnique
 
@@ -190,6 +191,14 @@ vectorOfUnique = vectorOfUnique' 30
 listOf1Unique :: Eq a => Gen a -> Gen [a]
 listOf1Unique g =
   N.toList <$> genNonEmptyUnique g
+
+-- | Generates a pair of lists of random length with no duplicate
+-- values across the combination of the lists . See 'listOf1Unique'.
+listOf1UniquePair :: Eq a => Gen a -> Gen ([a], [a])
+listOf1UniquePair g = do
+  l <- listOf1Unique g
+  c <- choose (0, length l)
+  pure $ splitAt c l
 
 genNonEmpty :: Gen a -> Gen (NonEmpty a)
 genNonEmpty g =

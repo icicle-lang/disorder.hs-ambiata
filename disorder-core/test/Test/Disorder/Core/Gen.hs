@@ -1,7 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Test.Disorder.Core.Gen where
 
-import           Data.List (nub)
+import           Data.Maybe
+import           Data.Monoid ((<>))
+import           Data.List (nub, partition, (\\))
 
 import           Disorder.Core.Gen
 import           Disorder.Core.IO
@@ -9,8 +11,7 @@ import           Disorder.Core.OrdPair
 import           Disorder.Core.Run
 
 import           Test.QuickCheck
-import           Data.Maybe
-import           Data.List (partition)
+
 
 
 prop_vectorOfSize :: OrdPair (Positive Int) -> Positive Int -> Property
@@ -57,6 +58,16 @@ prop_listOf1Unique =
     conjoin [
         xs === nub xs
       , (length xs >= 1) === True
+      ]
+
+prop_listOf1UniquePair :: Property
+prop_listOf1UniquePair =
+  forAll (listOf1UniquePair genValidUtf8) $ \(xs, ys) ->
+    conjoin [
+        xs <> ys === nub (xs <> ys)
+      , (length (xs <> ys) >= 1) === True
+      , xs \\ ys === xs
+      , ys \\ xs === ys
       ]
 
 return []
