@@ -11,6 +11,11 @@ import           Test.QuickCheck
 import           Prelude
 
 genTime :: Gen UTCTime
-genTime = UTCTime
-  <$> fmap ModifiedJulianDay arbitrary
-  <*> fmap (picosecondsToDiffTime . (*) 1000000000) (choose (0, 60 * 60 * 24 * 1000))
+genTime = 
+  let
+    -- Add one for leap seconds.
+    maxDayMilliseconds = 60 * 60 * 24 * 1000 + 1000
+  in
+  UTCTime
+    <$> fmap ModifiedJulianDay arbitrary
+    <*> fmap (picosecondsToDiffTime . (*) 1000000000) (choose (0, maxDayMilliseconds))
