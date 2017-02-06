@@ -92,15 +92,15 @@ prop_eg4 =
     (RecordWithFields 0 Nothing  [RecordWithFields 2 (Just 1) []])
     [ " RecordWithFields"
     , " { field1 ="
-    , "   0"
+    , "     0"
     , " , field2 ="
-    , "-  Just 1"
-    , "+  Nothing"
+    , "-    Just 1"
+    , "+    Nothing"
     , " , field3 ="
-    , "   ["
-    , "-    RecordWithFields { field1 = 2 , field2 = Nothing , field3 = [] }"
-    , "+    RecordWithFields { field1 = 2 , field2 = Just 1 , field3 = [] }"
-    , "   ]"
+    , "     ["
+    , "-      RecordWithFields { field1 = 2 , field2 = Nothing , field3 = [] }"
+    , "+      RecordWithFields { field1 = 2 , field2 = Just 1 , field3 = [] }"
+    , "     ]"
     , " }"
     ]
 
