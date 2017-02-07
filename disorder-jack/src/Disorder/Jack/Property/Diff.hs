@@ -45,7 +45,7 @@ renderDiffs val1 val2 = prints $ go 0 val1 val2
      , fmap (\(u,_) -> u) us == fmap (\(v,_) -> v) vs
      -> same i n
      -- Print field name too
-     <> goes (\i' (ix,u) (_,v) -> same i' (ix <> " =") <> go i' u v) "{" "," "}" i (List.zip us vs)
+     <> goes (\i' (ix,u) (_,v) -> same i' (ix <> " =") <> go (i' + 1) u v) "{" "," "}" i (List.zip us vs)
 
     -- Tuples and lists of same length
     (Pretty.Tuple us, Pretty.Tuple vs)
