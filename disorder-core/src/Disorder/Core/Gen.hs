@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Disorder.Core.Gen (
     GenSeed(..)
   , chooseSize
@@ -24,12 +25,14 @@ module Disorder.Core.Gen (
   -- * re-exports from quickcheck-text
   , genValidUtf8
   , genValidUtf81
+#if MIN_VERSION_quickcheck_text(0, 1, 1)
   , shrinkValidUtf8
   , shrinkValidUtf81
   , shrinkUtf8BS
   , shrinkUtf8BS1
   , utf8BS
   , utf8BS1
+#endif
   ) where
 
 import           Control.Applicative
