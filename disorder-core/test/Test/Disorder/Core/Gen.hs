@@ -11,8 +11,7 @@ import           Disorder.Core.OrdPair
 import           Disorder.Core.Run
 
 import           Test.QuickCheck
-
-
+import qualified Test.QuickCheck.Utf8 as Utf8
 
 prop_vectorOfSize :: OrdPair (Positive Int) -> Positive Int -> Property
 prop_vectorOfSize (OrdPair (Positive x) (Positive y)) (Positive s) = testIO $ do
@@ -43,18 +42,18 @@ prop_genFromMaybe =
 prop_vectorOfUnique :: Property
 prop_vectorOfUnique =
   forAll (choose (0, 100)) $ \n ->
-    forAll (vectorOfUnique n genValidUtf8) $ \xs ->
+    forAll (vectorOfUnique n Utf8.genValidUtf8) $ \xs ->
       (xs, length xs) === (nub xs, n)
 
 prop_vectorOfUnique' :: Property
 prop_vectorOfUnique' =
   expectFailure $
-    forAll (vectorOfUnique' 0 10 genValidUtf8) $ \xs ->
+    forAll (vectorOfUnique' 0 10 Utf8.genValidUtf8) $ \xs ->
       xs === nub xs
 
 prop_listOf1Unique :: Property
 prop_listOf1Unique =
-  forAll (listOf1Unique genValidUtf8) $ \xs ->
+  forAll (listOf1Unique Utf8.genValidUtf8) $ \xs ->
     conjoin [
         xs === nub xs
       , (length xs >= 1) === True
@@ -62,7 +61,7 @@ prop_listOf1Unique =
 
 prop_listOf1UniquePair :: Property
 prop_listOf1UniquePair =
-  forAll (listOf1UniquePair genValidUtf8) $ \(xs, ys) ->
+  forAll (listOf1UniquePair Utf8.genValidUtf8) $ \(xs, ys) ->
     conjoin [
         xs <> ys === nub (xs <> ys)
       , (length (xs <> ys) >= 1) === True
