@@ -37,16 +37,61 @@ module Disorder.Core.Gen (
 
 import           Control.Applicative
 
+import           Data.ByteString (ByteString)
 import           Data.List.NonEmpty (NonEmpty (..))
 import qualified Data.List.NonEmpty as N
 import           Data.Maybe (isJust)
 import           Data.Monoid ((<>))
+import           Data.Text (Text)
 
 import           Test.QuickCheck.Gen
 import           Test.QuickCheck.Random
-import           Test.QuickCheck.Utf8
+import qualified Test.QuickCheck.Utf8 as Utf8
 
 import           Prelude
+
+{-# DEPRECATED genValidUtf8 "Use Test.QuickCheck.Utf8.genValidUtf8 instead" #-}
+genValidUtf8 :: Gen Text
+genValidUtf8 =
+  Utf8.genValidUtf8
+
+{-# DEPRECATED genValidUtf81 "Use Test.QuickCheck.Utf8.genValidUtf81 instead" #-}
+genValidUtf81 :: Gen Text
+genValidUtf81 =
+  Utf8.genValidUtf81
+
+#if MIN_VERSION_quickcheck_text(0, 1, 1)
+{-# DEPRECATED shrinkValidUtf8 "Use Test.QuickCheck.Utf8.shrinkValidUtf8 instead" #-}
+shrinkValidUtf8 :: Text -> [Text]
+shrinkValidUtf8 =
+  Utf8.shrinkValidUtf8
+
+{-# DEPRECATED shrinkValidUtf81 "Use Test.QuickCheck.Utf8.shrinkValidUtf81 instead" #-}
+shrinkValidUtf81 :: Text -> [Text]
+shrinkValidUtf81 =
+  Utf8.shrinkValidUtf81
+
+{-# DEPRECATED shrinkUtf8BS "Use Test.QuickCheck.Utf8.shrinkUtf8BS instead" #-}
+shrinkUtf8BS :: ByteString -> [ByteString]
+shrinkUtf8BS =
+  Utf8.shrinkUtf8BS
+
+{-# DEPRECATED shrinkUtf8BS1 "Use Test.QuickCheck.Utf8.shrinkUtf8BS1 instead" #-}
+shrinkUtf8BS1 :: ByteString -> [ByteString]
+shrinkUtf8BS1 =
+  Utf8.shrinkUtf8BS1
+
+{-# DEPRECATED utf8BS "Use Test.QuickCheck.Utf8.utf8BS instead" #-}
+utf8BS :: Gen ByteString
+utf8BS =
+  Utf8.utf8BS
+
+{-# DEPRECATED utf8BS1 "Use Test.QuickCheck.Utf8.utf8BS1 instead" #-}
+utf8BS1 :: Gen ByteString
+utf8BS1 =
+  Utf8.utf8BS1
+#endif
+
 
 -- | Return a vector whose size is within the provided bounds
 vectorOfSize :: Int -> Int -> Gen a -> Gen [a]
