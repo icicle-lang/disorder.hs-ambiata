@@ -13,9 +13,9 @@ description:           disorder-core.
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , QuickCheck                      >= 2.7        && < 2.9
-                     , directory                       == 1.2.*
-                     , ieee754                         == 0.7.*
+                     , QuickCheck                      >= 2.7        && < 2.10
+                     , directory                       >= 1.2        && < 1.4
+                     , ieee754                         >= 0.7        && < 0.9
                      , quickcheck-text                 >= 0.1        && < 0.2
                      , process                         >= 1.2        && < 1.5
                      , semigroups                      >= 0.16       && < 0.19
@@ -61,10 +61,10 @@ test-suite test
   build-depends:
                        base                            >= 3          && < 5
                      , ambiata-disorder-core
-                     , QuickCheck                      >= 2.8.2      && < 2.9
+                     , QuickCheck                      >= 2.8.2      && < 2.10
                      , text
                      , quickcheck-instances            == 0.3.*
-                     , ieee754                         == 0.7.*
+                     , ieee754                         >= 0.7        && < 0.9
                      , transformers                    >= 0.3        && < 1
 
 test-suite test-cli
