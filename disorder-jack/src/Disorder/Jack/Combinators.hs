@@ -29,6 +29,7 @@ module Disorder.Jack.Combinators (
   , choose
   , chooseInt
   , chooseChar
+  , chooseRealFrac
 
   -- * List Combinators
   , oneOf
@@ -191,6 +192,11 @@ chooseInt =
 chooseChar :: (Char, Char) -> Jack Char
 chooseChar (b0, b1) =
   fmap chr $ choose (ord b0, ord b1)
+
+-- | Generates a 'RealFrac' in the given range.
+chooseRealFrac :: (Random a, RealFrac a) => (a, a) -> Jack a
+chooseRealFrac (x, y) =
+  mkJack QC.shrinkRealFrac $ QC.choose (x, y)
 
 -- | Randomly selects one of the jacks in the list.
 --   /The input list must be non-empty./
