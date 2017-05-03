@@ -8,6 +8,7 @@ module Disorder.Jack.Property (
 
   , shrinking
 
+  , generate
   , sample
   , sampleTree
   , printSample
@@ -118,6 +119,11 @@ shrinking tree pf =
 sample :: Jack a -> IO [a]
 sample =
   fmap (fmap outcome) . QC.sample' . runJack
+
+-- | Generate a single example.
+generate :: Jack a -> IO a
+generate =
+  fmap outcome . QC.generate . runJack
 
 -- | Generate some example trees.
 sampleTree :: Jack a -> IO [Tree a]
