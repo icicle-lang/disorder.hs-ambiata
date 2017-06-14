@@ -13,7 +13,7 @@ description:           disorder-corpus.
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , QuickCheck                      >= 2.7        && < 2.9
+                     , QuickCheck                      >= 2.7        && < 2.10
 
   ghc-options:
                        -Wall
@@ -40,5 +40,4 @@ test-suite test
                        base                            >= 3          && < 5
                      , ambiata-disorder-corpus
                      , text
-                     , QuickCheck                      >= 2.8.2      && < 2.9
-
+                     , QuickCheck                      >= 2.7        && < 2.10

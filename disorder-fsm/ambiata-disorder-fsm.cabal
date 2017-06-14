@@ -16,7 +16,7 @@ library
                      , containers                      >= 0.5        && < 0.7
                      , exceptions                      == 0.8.*
                      , mtl                             >= 2.1        && < 2.3
-                     , QuickCheck                      >= 2.7        && < 2.9
+                     , QuickCheck                      >= 2.7        && < 2.10
                      , time
                      , transformers                    >= 0.3        && < 1
 
