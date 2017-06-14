@@ -26,7 +26,6 @@ library
 
 
   exposed-modules:
-                       Paths_ambiata_disorder_lens
                        Disorder.Lens
 
 test-suite test

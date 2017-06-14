@@ -30,7 +30,6 @@ library
 
 
   exposed-modules:
-                       Paths_ambiata_disorder_fsm
                        Disorder.FSM
                        Disorder.FSM.Catch
                        Disorder.FSM.Core

@@ -31,7 +31,6 @@ library
 
 
   exposed-modules:
-                       Paths_ambiata_disorder_cli
                        Disorder.Cli.Shell
 
 test-suite test-io

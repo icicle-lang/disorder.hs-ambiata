@@ -25,5 +25,4 @@ library
 
 
   exposed-modules:
-                       Paths_ambiata_disorder_eithert
                        Disorder.Either

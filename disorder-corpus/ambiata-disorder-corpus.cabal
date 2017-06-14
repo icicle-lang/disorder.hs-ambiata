@@ -23,7 +23,6 @@ library
 
 
   exposed-modules:
-                       Paths_ambiata_disorder_corpus
                        Disorder.Corpus
 
 test-suite test
