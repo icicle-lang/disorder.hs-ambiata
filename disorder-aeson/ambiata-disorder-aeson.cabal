@@ -15,7 +15,7 @@ library
                        base                            >= 3          && < 6
                      , aeson                           >= 0.8        && < 0.12
                      , ambiata-disorder-core
-                     , QuickCheck                      >= 2.7        && < 2.9
+                     , QuickCheck                      >= 2.7        && < 2.10
                      , time
 
   ghc-options:
@@ -26,7 +26,6 @@ library
 
 
   exposed-modules:
-                       Paths_ambiata_disorder_aeson
                        Disorder.Aeson
                        Disorder.Aeson.Time
 
@@ -44,5 +43,5 @@ test-suite test
                        base                            >= 3          && < 6
                      , ambiata-disorder-aeson
                      , aeson
-                     , QuickCheck                      >= 2.8.2      && < 2.9
+                     , QuickCheck                      >= 2.7        && < 2.10
                      , time
