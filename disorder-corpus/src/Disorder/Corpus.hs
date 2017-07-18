@@ -16,6 +16,7 @@ module Disorder.Corpus (
   , vegetables
   , fruits
   , glass
+  , cats
 
   -- * Deprecated
   , genCorpus
@@ -294,6 +295,28 @@ fruits = [
   , "strawberry"
   , "tangerine"
   , "watermelon"
+  ]
+
+cats :: IsString a => [a]
+cats = [
+    "american_curl"
+  , "american_shorthair"
+  , "angora"
+  , "british_shorthair"
+  , "bobtail"
+  , "exotic_shorthair"
+  , "himalayan"
+  , "maine_coon"
+  , "munchkin"
+  , "norwegian_forest"
+  , "persian"
+  , "ragamuffin"
+  , "ragdoll"
+  , "russian_blue"
+  , "scottish_fold"
+  , "siamese"
+  , "siberian"
+  , "tabby"
   ]
 
 -- | How to say "I can eat glass, and it doesn't hurt me." in a few different
