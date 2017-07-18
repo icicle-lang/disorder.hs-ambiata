@@ -15,6 +15,8 @@ module Disorder.Corpus (
   , animals
   , vegetables
   , fruits
+  , nhl
+  , nfl
   , glass
   , cats
 
@@ -317,6 +319,77 @@ cats = [
   , "siamese"
   , "siberian"
   , "tabby"
+  ]
+
+nhl :: IsString a => [a]
+nhl = [
+    "Anaheim Ducks"
+  , "Arizona Coyotes"
+  , "Boston Bruins"
+  , "Buffalo Sabres"
+  , "Calgary Flames"
+  , "Carolina Hurricanes"
+  , "Chicago Blackhawks"
+  , "Colorado Avalanche"
+  , "Columbus Blue Jackets"
+  , "Dallas Stars"
+  , "Detroit Red Wings"
+  , "Edmonton Oilers"
+  , "Florida Panthers"
+  , "Los Angeles Kings"
+  , "Minnesota Wild"
+  , "Montréal Canadiens"
+  , "Nashville Predators"
+  , "New Jersey Devils"
+  , "New York Islanders"
+  , "New York Rangers"
+  , "Ottawa Senators"
+  , "Philadelphia Flyers"
+  , "Pittsburgh Penguins"
+  , "San Jose Sharks"
+  , "St. Louis Blues"
+  , "Tampa Bay Lightning"
+  , "Toronto Maple Leafs"
+  , "Vancouver Canucks"
+  , "Vegas Golden Knights"
+  , "Washington Capitals"
+  , "Winnipeg Jets"
+  ]
+
+nfl :: IsString a => [a]
+nfl = [
+    "Arizona Cardinals"
+  , "Atlanta Falcons"
+  , "Baltimore Ravens"
+  , "Buffalo Bills"
+  , "Carolina Panthers"
+  , "Chicago Bears"
+  , "Cincinnati Bengals"
+  , "Cleveland Browns"
+  , "Dallas Cowboys"
+  , "Denver Broncos"
+  , "Detroit Lions"
+  , "Green Bay Packers"
+  , "Houston Texans"
+  , "Indianapolis Colts"
+  , "Jacksonville Jaguars"
+  , "Kansas City Chiefs"
+  , "Miami Dolphins"
+  , "Minnesota Vikings"
+  , "New England Patriots"
+  , "New Orleans Saints"
+  , "New York Giants"
+  , "New York Jets"
+  , "Oakland Raiders"
+  , "Philadelphia Eagles"
+  , "Pittsburgh Steelers"
+  , "San Diego Chargers"
+  , "San Francisco 49ers"
+  , "Seattle Seahawks"
+  , "St. Louis Rams"
+  , "Tampa Bay Buccaneers"
+  , "Tennessee Titans"
+  , "Washington Redskins"
   ]
 
 -- | How to say "I can eat glass, and it doesn't hurt me." in a few different
