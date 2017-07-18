@@ -3,22 +3,23 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Disorder.Corpus (
-    cooking
-  , muppets
-  , southpark
-  , simpsons
-  , viruses
-  , colours
-  , weather
-  , waters
-  , boats
+    agile
   , animals
-  , vegetables
-  , fruits
-  , nhl
-  , nfl
-  , glass
+  , boats
   , cats
+  , colours
+  , cooking
+  , fruits
+  , glass
+  , muppets
+  , nfl
+  , nhl
+  , simpsons
+  , southpark
+  , vegetables
+  , viruses
+  , waters
+  , weather
 
   -- * Deprecated
   , genCorpus
@@ -390,6 +391,32 @@ nfl = [
   , "Tampa Bay Buccaneers"
   , "Tennessee Titans"
   , "Washington Redskins"
+  ]
+
+agile :: IsString a => [a]
+agile = [
+    "agile"
+  , "backlog"
+  , "burn-down chart"
+  , "epic"
+  , "extreme programming"
+  , "information radiator"
+  , "kanban"
+  , "lean"
+  , "pair programming"
+  , "planning poker"
+  , "product owner"
+  , "retrospective"
+  , "scrum"
+  , "scrum master"
+  , "spike"
+  , "sprint"
+  , "standup"
+  , "story points"
+  , "test driven"
+  , "user story"
+  , "velocity"
+  , "vertical slice"
   ]
 
 -- | How to say "I can eat glass, and it doesn't hurt me." in a few different
