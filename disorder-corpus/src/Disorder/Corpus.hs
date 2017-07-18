@@ -12,6 +12,9 @@ module Disorder.Corpus (
   , weather
   , waters
   , boats
+  , animals
+  , vegetables
+  , fruits
   , glass
 
   -- * Deprecated
@@ -190,6 +193,107 @@ boats = [
   , "trawler"
   , "tugboat"
   , "yacht"
+  ]
+
+animals :: IsString a => [a]
+animals = [
+    "alligator"
+  , "ant"
+  , "bear"
+  , "bee"
+  , "bird"
+  , "camel"
+  , "cat"
+  , "cheetah"
+  , "chicken"
+  , "chimpanzee"
+  , "cow"
+  , "crocodile"
+  , "deer"
+  , "dog"
+  , "dolphin"
+  , "duck"
+  , "eagle"
+  , "elephant"
+  , "fish"
+  , "fly"
+  , "fox"
+  , "frog"
+  , "giraffe"
+  , "goat"
+  , "goldfish"
+  , "hamster"
+  , "hippopotamus"
+  , "horse"
+  , "kangaroo"
+  , "kitten"
+  , "lion"
+  , "lobster"
+  , "monkey"
+  , "octopus"
+  , "owl"
+  , "panda"
+  , "pig"
+  , "puppy"
+  , "rabbit"
+  , "rat"
+  , "scorpion"
+  , "seal"
+  , "shark"
+  , "sheep"
+  , "snail"
+  , "snake"
+  , "spider"
+  , "squirrel"
+  , "tiger"
+  , "turtle"
+  , "wolf"
+  , "zebra"
+  ]
+
+vegetables :: IsString a => [a]
+vegetables = [
+    "asparagus"
+  , "beans"
+  , "broccoli"
+  , "cabbage"
+  , "carrot"
+  , "celery"
+  , "corn"
+  , "cucumber"
+  , "eggplant"
+  , "green pepper"
+  , "lettuce"
+  , "onion"
+  , "peas"
+  , "potato"
+  , "pumpkin"
+  , "radish"
+  , "spinach"
+  , "sweet potato"
+  , "tomato" -- Don't be so pedantic! It's a culinary vegetable.
+  , "turnip"
+  ]
+
+fruits :: IsString a => [a]
+fruits = [
+    "apple"
+  , "banana"
+  , "cherry"
+  , "grapefruit"
+  , "grapes"
+  , "lemon"
+  , "lime"
+  , "melon"
+  , "orange"
+  , "peach"
+  , "pear"
+  , "persimmon"
+  , "pineapple"
+  , "plum"
+  , "strawberry"
+  , "tangerine"
+  , "watermelon"
   ]
 
 -- | How to say "I can eat glass, and it doesn't hurt me." in a few different
