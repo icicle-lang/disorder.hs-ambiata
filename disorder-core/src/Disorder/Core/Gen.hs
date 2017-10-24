@@ -55,8 +55,26 @@ vectorOfSize min' max' gen =
 
 -- | Return an 'Int' which is between the provided range, and influenced by the current "size"
 chooseSize :: Int -> Int -> Gen Int
-chooseSize min' max' =
-  sized (return . min max' . max min')
+chooseSize x0 y0 =
+  sized $ \sz0 ->
+    let
+      x =
+        toInteger x0
+
+      y =
+        toInteger y0
+
+      sz =
+        toInteger sz0
+
+      diff =
+        ((y - x) * sz) `quot` 99
+
+      xdiff =
+        fromIntegral $
+          min (fromIntegral y0) (x + diff)
+    in
+      choose (x0, xdiff)
 
 -- | from a generator return a generator that will generate Nothing sometimes
 maybeGen :: Gen a -> Gen (Maybe a)
