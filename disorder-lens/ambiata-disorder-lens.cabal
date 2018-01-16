@@ -13,7 +13,7 @@ description:           disorder-lens.
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , lens                            >= 4.6        && < 4.15
+                     , lens                            >= 4.6        && < 4.16
                      , QuickCheck                      >= 2.7        && < 2.10
 
   ghc-options:
