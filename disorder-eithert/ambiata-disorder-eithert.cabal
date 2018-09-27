@@ -13,7 +13,7 @@ description:           disorder-eithert.
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , QuickCheck                      >= 2.7        && < 2.13
+                     , QuickCheck                      >= 2.12       && < 2.13
                      , text                            >= 1.1        && < 1.3
                      , transformers                    >= 0.4        && < 1
 
