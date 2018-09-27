@@ -17,9 +17,7 @@ library
                      , containers                      >= 0.4        && < 0.6
                      , deepseq                         >= 1.2        && < 1.5
                      , pretty-show                     >= 1.6        && < 1.7
-                     -- TODO something broken in 2.11 for jack
-                     -- prop_ap_all_the_things from test/Test/Disorder/Jack/Core.hs:59 fails
-                     , QuickCheck                      >= 2.7        && < 2.11
+                     , QuickCheck                      >= 2.7        && < 2.13
                      , quickcheck-text                 >= 0.1        && < 0.2
                      , random                          >= 1.1        && < 1.2
                      , semigroups                      >= 0.16       && < 0.19
