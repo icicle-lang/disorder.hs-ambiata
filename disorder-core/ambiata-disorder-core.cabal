@@ -14,7 +14,7 @@ tested-with:           GHC==8.0.2, GHC==7.10.2
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , QuickCheck                      >= 2.7        && < 2.13
+                     , QuickCheck                      >= 2.12       && < 2.13
                      , directory                       >= 1.2        && < 1.6
                      , ieee754                         >= 0.7        && < 0.9
                      , quickcheck-text                 >= 0.1        && < 0.2
@@ -66,7 +66,7 @@ test-suite test
                      , ambiata-disorder-core
                      , QuickCheck
                      , text
-                     , quickcheck-instances            == 0.3.*
+                     , quickcheck-instances
                      , ieee754
                      , transformers
 
