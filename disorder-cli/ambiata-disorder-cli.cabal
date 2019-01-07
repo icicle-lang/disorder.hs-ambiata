@@ -1,12 +1,12 @@
 name:                  ambiata-disorder-cli
-version:               0.0.1
+version:               0.0.2
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
 maintainer:            Ambiata <info@ambiata.com>
 copyright:             (c) 2015 Ambiata
 synopsis:              disorder-cli
 category:              System
-cabal-version:         >= 1.8
+cabal-version:         >= 1.24
 build-type:            Simple
 description:           disorder-cli.
 
@@ -22,6 +22,9 @@ library
                      -- https://github.com/Gabriel439/Haskell-Managed-Library/issues/6
                      , transformers                    >= 0.4        && < 0.6
                      , turtle                          == 1.2.*
+
+  default-language:
+                      Haskell2010
 
   ghc-options:
                        -Wall
@@ -40,9 +43,12 @@ test-suite test-io
   hs-source-dirs:      test
   build-depends:       base                            >= 3          && < 6
                      , QuickCheck                      >= 2.7        && < 2.10
+                     , ambiata-disorder-core
                      , ambiata-disorder-cli
-                     , directory                       == 1.2.*
-                     , ieee754                         == 0.7.*
-                     , process                         >= 1.2        && < 1.5
-                     , text                            >= 1.1        && < 1.3
-                     , turtle                          == 1.2.*
+                     , directory
+                     , ieee754
+                     , process
+                     , text
+                     , turtle
+  default-language:
+                      Haskell2010

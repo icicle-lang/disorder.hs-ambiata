@@ -236,8 +236,7 @@ anyFile opened = L.any ((== opened) . isJust) . fmap fileHandle . M.elems . file
 anyClosedNonEmptyFile :: FileSystem -> Bool
 anyClosedNonEmptyFile = L.any (\(File mh ls) -> isNothing mh && ls /= []) . M.elems . fileSystemFiles
 
-
-monadicCont :: PropertyM (CatchableContT Property IO) a -> Property
+monadicCont :: Testable a => PropertyM (CatchableContT Property IO) a -> Property
 monadicCont = monadic $ ioProperty . evalCatchableContT
 
 evalContT :: (Monad m) => ContT r m r -> m r

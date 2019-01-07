@@ -1,54 +1,6 @@
 [boris]
   version = 1
 
-[build.dist-7-8-core]
-  command = [["master", "build", "dist-7-8", "-C", "disorder-core"]]
-
-[build.dist-7-8-corpus]
-  command = [["master", "build", "dist-7-8", "-C", "disorder-corpus"]]
-
-[build.dist-7-8-jack]
-  command = [["master", "build", "dist-7-8", "-C", "disorder-jack"]]
-
-[build.dist-7-8-cli]
-  command = [["master", "build", "dist-7-8", "-C", "disorder-cli"]]
-
-[build.dist-7-8-aeson]
-  command = [["master", "build", "dist-7-8", "-C", "disorder-aeson"]]
-
-[build.dist-7-8-eithert]
-  command = [["master", "build", "dist-7-8", "-C", "disorder-eithert"]]
-
-[build.dist-7-8-fsm]
-  command = [["master", "build", "dist-7-8", "-C", "disorder-fsm"]]
-
-[build.dist-7-8-lens]
-  command = [["master", "build", "dist-7-8", "-C", "disorder-lens"]]
-
-[build.dist-7-10-core]
-  command = [["master", "build", "dist-7-10", "-C", "disorder-core"]]
-
-[build.dist-7-10-corpus]
-  command = [["master", "build", "dist-7-10", "-C", "disorder-corpus"]]
-
-[build.dist-7-10-jack]
-  command = [["master", "build", "dist-7-10", "-C", "disorder-jack"]]
-
-[build.dist-7-10-cli]
-  command = [["master", "build", "dist-7-10", "-C", "disorder-cli"]]
-
-[build.dist-7-10-aeson]
-  command = [["master", "build", "dist-7-10", "-C", "disorder-aeson"]]
-
-[build.dist-7-10-eithert]
-  command = [["master", "build", "dist-7-10", "-C", "disorder-eithert"]]
-
-[build.dist-7-10-fsm]
-  command = [["master", "build", "dist-7-10", "-C", "disorder-fsm"]]
-
-[build.dist-7-10-lens]
-  command = [["master", "build", "dist-7-10", "-C", "disorder-lens"]]
-
 [build.dist-8-0-core]
   command = [["master", "build", "dist-8-0", "-C", "disorder-core"]]
 
@@ -72,30 +24,6 @@
 
 [build.dist-8-0-lens]
   command = [["master", "build", "dist-8-0", "-C", "disorder-lens"]]
-
-[build.branches-7-8-core]
-  command = [["master", "build", "branches-7-8", "-C", "disorder-core"]]
-
-[build.branches-7-8-corpus]
-  command = [["master", "build", "branches-7-8", "-C", "disorder-corpus"]]
-
-[build.branches-7-8-jack]
-  command = [["master", "build", "branches-7-8", "-C", "disorder-jack"]]
-
-[build.branches-7-8-cli]
-  command = [["master", "build", "branches-7-8", "-C", "disorder-cli"]]
-
-[build.branches-7-8-aeson]
-  command = [["master", "build", "branches-7-8", "-C", "disorder-aeson"]]
-
-[build.branches-7-8-eithert]
-  command = [["master", "build", "branches-7-8", "-C", "disorder-eithert"]]
-
-[build.branches-7-8-fsm]
-  command = [["master", "build", "branches-7-8", "-C", "disorder-fsm"]]
-
-[build.branches-7-8-lens]
-  command = [["master", "build", "branches-7-8", "-C", "disorder-lens"]]
 
 [build.branches-7-10-core]
   command = [["master", "build", "branches-7-10", "-C", "disorder-core"]]
