@@ -1,12 +1,12 @@
 name:                  ambiata-disorder-lens
-version:               0.0.1
+version:               0.0.2
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
 maintainer:            Ambiata <info@ambiata.com>
 copyright:             (c) 2015 Ambiata
 synopsis:              disorder-lens
 category:              System
-cabal-version:         >= 1.8
+cabal-version:         >= 1.22
 build-type:            Simple
 description:           disorder-lens.
 
@@ -14,7 +14,10 @@ library
   build-depends:
                        base                            >= 3          && < 5
                      , lens                            >= 4.6        && < 4.16
-                     , QuickCheck                      >= 2.7        && < 2.10
+                     , QuickCheck                      >= 2.7        && < 2.12
+
+  default-language:
+                      Haskell2010
 
   ghc-options:
                        -Wall
@@ -41,7 +44,10 @@ test-suite test
                        test
 
   build-depends:
-                       base                            >= 3          && < 5
+                       base
                      , ambiata-disorder-lens
                      , lens
-                     , QuickCheck                      >= 2.7        && < 2.10
+                     , QuickCheck
+
+  default-language:
+                      Haskell2010

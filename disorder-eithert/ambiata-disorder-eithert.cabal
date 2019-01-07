@@ -1,21 +1,24 @@
 name:                  ambiata-disorder-eithert
-version:               0.0.1
+version:               0.0.2
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
 maintainer:            Ambiata <info@ambiata.com>
 copyright:             (c) 2015 Ambiata
 synopsis:              disorder-eithert
 category:              System
-cabal-version:         >= 1.8
+cabal-version:         >= 1.22
 build-type:            Simple
 description:           disorder-eithert.
 
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , QuickCheck                      >= 2.7        && < 2.10
+                     , QuickCheck                      >= 2.7        && < 2.12
                      , text                            >= 1.1        && < 1.3
                      , transformers                    >= 0.4        && < 1
+
+  default-language:
+                      Haskell2010
 
   ghc-options:
                        -Wall

@@ -1,5 +1,6 @@
 module Disorder.Core.IO (
-    testIO
+    stopIO
+  , testIO
   , testPropertyIO
   , withCPUTime
   ) where
@@ -15,7 +16,7 @@ testIO :: Testable a => IO a -> Property
 testIO = testPropertyIO . run
 
 testPropertyIO :: Testable a => PropertyM IO a -> Property
-testPropertyIO = monadicIO . (=<<) stop
+testPropertyIO = monadicIO . (=<<) stopIO
 
 -- | Perform an action and return the CPU time it takes, in picoseconds
 -- (actual precision varies with implementation).
@@ -25,3 +26,7 @@ withCPUTime a = do
   r <- a
   t2 <- liftIO getCPUTime
   return (t2 - t1, r)
+
+-- | A IO typed version of Test.QuickCheck.Monadic.stop due to changes in QuickCheck 2.10
+stopIO :: (Testable a) => a -> PropertyM IO a
+stopIO p = MkPropertyM (\_k -> return (return (property p)))

@@ -1,12 +1,12 @@
 name:                  ambiata-disorder-jack
-version:               0.0.1
+version:               0.0.2
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
 maintainer:            Ambiata <info@ambiata.com>
 copyright:             (c) 2015 Ambiata
 synopsis:              disorder-jack
 category:              System
-cabal-version:         >= 1.8
+cabal-version:         >= 1.22
 build-type:            Simple
 description:           disorder-jack.
 
@@ -17,12 +17,17 @@ library
                      , containers                      >= 0.4        && < 0.6
                      , deepseq                         >= 1.2        && < 1.5
                      , pretty-show                     >= 1.6        && < 1.7
-                     , QuickCheck                      >= 2.7        && < 2.10
+                     -- TODO something broken in 2.11 for jack
+                     -- prop_ap_all_the_things from test/Test/Disorder/Jack/Core.hs:59 fails
+                     , QuickCheck                      >= 2.7        && < 2.11
                      , quickcheck-text                 >= 0.1        && < 0.2
                      , random                          >= 1.1        && < 1.2
                      , semigroups                      >= 0.16       && < 0.19
                      , text                            >= 1.1        && < 1.3
                      , transformers                    >= 0.3        && < 0.6
+
+  default-language:
+                      Haskell2010
 
   ghc-options:         -Wall
 
@@ -59,14 +64,17 @@ test-suite test
                        test
 
   build-depends:
-                       base                            >= 3          && < 5
+                       base
                      , ambiata-disorder-core
                      , ambiata-disorder-jack
-                     , comonad                         >= 4.2        && < 5.1
-                     , containers                      >= 0.4        && < 0.6
-                     , pretty-show                     >= 1.6        && < 1.7
-                     , QuickCheck                      >= 2.7        && < 2.10
+                     , comonad
+                     , containers
+                     , pretty-show
+                     , QuickCheck
                      , quickcheck-instances            == 0.3.*
-                     , semigroups                      >= 0.16       && < 0.19
-                     , text                            >= 1.1        && < 1.3
-                     , transformers                    >= 0.3        && < 0.6
+                     , semigroups
+                     , text
+                     , transformers
+
+  default-language:
+                      Haskell2010
