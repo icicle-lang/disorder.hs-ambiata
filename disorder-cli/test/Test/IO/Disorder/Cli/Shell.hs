@@ -25,7 +25,7 @@ boring = fmap T.pack . listOf1 $ elements (['a'..'z'] <> ['A'..'Z'] <> ['0'..'9'
 
 prop_testShell :: Property
 prop_testShell = forAll (listOf1 boring) $ \ms -> (monadicIO . (=<<) stopIO . run) $ do
-  (st, out) <- testShell ["tac"] $ select ms
+  (st, out) <- testShell ["tac"] $ select (toLine ms)
   pure $ (st, out) === (ExitSuccess, flip T.snoc '\n' $ T.intercalate "\n" (reverse ms))
 
 prop_testShell_succ :: Property

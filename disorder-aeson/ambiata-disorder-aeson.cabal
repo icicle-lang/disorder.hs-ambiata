@@ -15,7 +15,7 @@ library
                        base                            >= 3          && < 6
                      , aeson                           >= 0.8        && < 1.2
                      , ambiata-disorder-core
-                     , QuickCheck
+                     , QuickCheck                      
                      , time
 
   default-language:

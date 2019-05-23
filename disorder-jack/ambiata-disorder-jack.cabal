@@ -17,7 +17,7 @@ library
                      , containers                      >= 0.4        && < 0.6
                      , deepseq                         >= 1.2        && < 1.5
                      , pretty-show                     >= 1.6        && < 1.7
-                     , QuickCheck                      >= 2.12       && < 2.13
+                     , QuickCheck                      >= 2.7
                      , quickcheck-text                 >= 0.1        && < 0.2
                      , random                          >= 1.1        && < 1.2
                      , semigroups                      >= 0.16       && < 0.19
@@ -62,14 +62,17 @@ test-suite test
                        test
 
   build-depends:
-                       base
+                       base                            >= 3          && < 5
                      , ambiata-disorder-core
                      , ambiata-disorder-jack
                      , comonad
                      , containers
                      , pretty-show
-                     , QuickCheck
-                     , quickcheck-instances            == 0.3.*
+                     -- something is broken in 2.11 and later for jack
+                     -- prop_ap_all_the_things from test/Test/Disorder/Jack/Core.hs:59 fails
+                     , QuickCheck                      >= 2.7 && < 2.11
+                     , QuickCheck                     
+                     , quickcheck-instances            
                      , semigroups
                      , text
                      , transformers

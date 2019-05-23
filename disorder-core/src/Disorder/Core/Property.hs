@@ -1,5 +1,7 @@
+{-# LANGUAGE CPP #-}
 module Disorder.Core.Property (
-    (~~~)
+    (=/=)
+  , (~~~)
   , (###)
   , (.^.)
   , (<=>)
@@ -15,6 +17,13 @@ import           Data.Text                (Text, unpack)
 
 import           Test.QuickCheck.Gen
 import           Test.QuickCheck.Property
+
+
+#if ! MIN_VERSION_QuickCheck(2, 12, 0)
+infix 4 =/=
+(=/=) :: (Eq a, Show a) => a -> a -> Property
+x =/= y = counterexample (concat [show x, " == ", show y]) $ x /= y
+#endif
 
 infix 4 ~~~
 
