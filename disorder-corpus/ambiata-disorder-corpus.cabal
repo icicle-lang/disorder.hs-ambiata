@@ -1,5 +1,5 @@
 name:                  ambiata-disorder-corpus
-version:               0.0.2
+version:               0.0.3
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
 maintainer:            Ambiata <info@ambiata.com>
@@ -13,7 +13,7 @@ description:           disorder-corpus.
 library
   build-depends:
                        base                            >= 3          && < 5
-                     , QuickCheck                      >= 2.7        && < 2.12
+                     , QuickCheck                      >= 2.7
 
   default-language:
                       Haskell2010

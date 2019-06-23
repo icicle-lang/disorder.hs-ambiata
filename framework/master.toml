@@ -6,13 +6,13 @@
 [global]
   CACHE = "true"
 
-#[build.dist-8-2]
-#  GHC_VERSION = "8.2.2"
-#  CABAL_VERSION = "2.0.0.1"
-#
-#[build.branches-8-2]
-#  GHC_VERSION = "8.2.2"
-#  CABAL_VERSION = "2.0.0.1"
+[build.dist-8-2]
+  GHC_VERSION = "8.2.2"
+  CABAL_VERSION = "2.0.0.1"
+
+[build.branches-8-2]
+  GHC_VERSION = "8.2.2"
+  CABAL_VERSION = "2.0.0.1"
 
 [build.dist-7-10]
   GHC_VERSION = "7.10.2"

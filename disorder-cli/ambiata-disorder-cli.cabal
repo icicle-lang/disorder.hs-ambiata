@@ -1,5 +1,5 @@
 name:                  ambiata-disorder-cli
-version:               0.0.2
+version:               0.0.3
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
 maintainer:            Ambiata <info@ambiata.com>
@@ -14,14 +14,14 @@ library
   build-depends:
                        base                            >= 3          && < 6
                      , clock                           == 0.5.*
-                     , directory                       == 1.2.*
+                     , directory                       >= 1.2        && < 1.6
                      , ieee754                         == 0.7.*
-                     , process                         >= 1.2        && < 1.5
+                     , process                         >= 1.2        && < 1.7
                      , text                            >= 1.1        && < 1.3
                      -- Minimum requirement for managed 1.0.3 due to 'Control.Monad.Trans.Except'
                      -- https://github.com/Gabriel439/Haskell-Managed-Library/issues/6
                      , transformers                    >= 0.4        && < 0.6
-                     , turtle                          == 1.2.*
+                     , turtle                          >= 1.2        && < 1.6
 
   default-language:
                       Haskell2010
@@ -42,7 +42,7 @@ test-suite test-io
   ghc-options:         -Wall -threaded -O2
   hs-source-dirs:      test
   build-depends:       base                            >= 3          && < 6
-                     , QuickCheck                      >= 2.7        && < 2.10
+                     , QuickCheck
                      , ambiata-disorder-core
                      , ambiata-disorder-cli
                      , directory

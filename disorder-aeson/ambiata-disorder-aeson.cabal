@@ -1,5 +1,5 @@
 name:                  ambiata-disorder-aeson
-version:               0.0.2
+version:               0.0.3
 license:               AllRightsReserved
 author:                Ambiata <info@ambiata.com>
 maintainer:            Ambiata <info@ambiata.com>
@@ -15,7 +15,7 @@ library
                        base                            >= 3          && < 6
                      , aeson                           >= 0.8        && < 1.2
                      , ambiata-disorder-core
-                     , QuickCheck                      >= 2.7        && < 2.12
+                     , QuickCheck                      
                      , time
 
   default-language:
